@@ -10,17 +10,80 @@
     rel="stylesheet" />
   <link rel="stylesheet" href="../../shared/shared.css" />
   <style>
+    /* VARIABLES THEME STRANGER THINGS */
+    :root {
+      --st-red: #e50914;
+      --st-red-glow: rgba(229, 9, 20, 0.7);
+      --st-cyan: #00f3ff;
+      --st-dark: #0b0b0b;
+      --st-panel: rgba(11, 11, 11, 0.90);
+    }
+
     body {
-      background: var(--bg);
+      background-color: var(--st-dark);
+      background-image: linear-gradient(rgba(11, 11, 11, 0.8), rgba(11, 11, 11, 0.95)), url('images/fondo.jpg');
+      background-size: cover;
+      background-position: center;
+      background-attachment: fixed;
       display: flex;
       flex-direction: column;
       min-height: 100vh;
+      color: white;
+      margin: 0;
+    }
+
+    /* EFECTO CENIZAS (UPSIDE DOWN) */
+    #ash-fall {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      pointer-events: none;
+      z-index: 50;
+      overflow: hidden;
+    }
+
+    .ash {
+      position: absolute;
+      background: #d4d4d4;
+      width: 4px;
+      height: 4px;
+      border-radius: 50%;
+      opacity: 0.6;
+      animation: drift linear infinite;
+      box-shadow: 0 0 5px rgba(255, 255, 255, 0.4);
+    }
+
+    @keyframes drift {
+      0% {
+        transform: translateY(-20px) translateX(0) scale(1);
+        opacity: 0;
+      }
+
+      10% {
+        opacity: 0.8;
+      }
+
+      50% {
+        transform: translateY(50vh) translateX(20px) scale(1.2);
+      }
+
+      90% {
+        opacity: 0.8;
+      }
+
+      100% {
+        transform: translateY(105vh) translateX(-15px) scale(1);
+        opacity: 0;
+      }
     }
 
     .game-topbar {
       height: 56px;
-      background: rgba(7, 7, 26, .95);
-      border-bottom: 1px solid var(--border);
+      background: rgba(0, 0, 0, 0.9);
+      border-bottom: 2px solid var(--st-red);
+      box-shadow: 0 0 15px var(--st-red-glow);
       display: flex;
       align-items: center;
       padding: 0 1.5rem;
@@ -33,54 +96,83 @@
     }
 
     .game-back-btn {
-      background: var(--bg3);
-      border: 1px solid var(--border);
+      background: transparent;
+      border: 2px solid var(--st-cyan);
+      box-shadow: 0 0 8px rgba(0, 243, 255, 0.4);
       border-radius: 8px;
-      color: var(--text);
+      color: var(--st-cyan);
       padding: .4rem .875rem;
       font-size: .8rem;
       font-weight: 800;
       cursor: pointer;
       text-decoration: none;
-      transition: border-color .2s;
+      text-transform: uppercase;
+      transition: all .2s;
     }
 
     .game-back-btn:hover {
-      border-color: var(--violet);
+      background: var(--st-cyan);
+      color: black;
+      box-shadow: 0 0 15px var(--st-cyan);
     }
 
     .game-title {
       font-family: 'Press Start 2P', monospace;
-      font-size: .6rem;
-      color: var(--pink);
+      font-size: .7rem;
+      color: white;
+      text-shadow: 0 0 5px var(--st-red), 0 0 15px var(--st-red);
       flex: 1;
       text-align: center;
+      letter-spacing: 2px;
     }
 
     .game-timer {
       font-family: 'Press Start 2P', monospace;
       font-size: .5rem;
-      color: var(--cyan);
+      color: var(--st-cyan);
+      text-shadow: 0 0 8px var(--st-cyan);
+    }
+
+    .game-timer.peligro {
+      color: var(--st-red);
+      text-shadow: 0 0 8px var(--st-red);
+      animation: latido 1s infinite;
+    }
+
+    @keyframes latido {
+
+      0%,
+      100% {
+        transform: scale(1);
+      }
+
+      50% {
+        transform: scale(1.2);
+      }
     }
 
     .game-wrap {
-      padding: 72px 1.5rem 2rem;
+      padding: 85px 1.5rem 2rem;
       max-width: 800px;
       margin: 0 auto;
       width: 100%;
+      position: relative;
+      z-index: 60;
     }
 
     .meta-bar {
       display: flex;
       gap: 1rem;
-      margin-bottom: 1.5rem;
+      margin-bottom: 2rem;
       flex-wrap: wrap;
+      justify-content: center;
     }
 
     .meta-item {
-      background: var(--card);
-      border: 1px solid var(--border);
-      border-radius: var(--radius-sm);
+      background: var(--st-panel);
+      border: 1px solid var(--st-red);
+      box-shadow: 0 0 10px rgba(229, 9, 20, 0.3) inset;
+      border-radius: 8px;
       padding: .625rem 1rem;
       display: flex;
       gap: .5rem;
@@ -90,28 +182,39 @@
     .meta-label {
       font-family: 'Press Start 2P', monospace;
       font-size: .35rem;
-      color: var(--text-muted);
+      color: #aaa;
     }
 
     .meta-val {
       font-family: 'Press Start 2P', monospace;
       font-size: .6rem;
       color: white;
+      text-shadow: 0 0 5px white;
     }
 
     /* GRID DE CARTAS */
     .cartas-grid {
       display: grid;
       grid-template-columns: repeat(4, 1fr);
-      gap: .875rem;
+      gap: 1rem;
       margin-bottom: 1.5rem;
+      transition: all 0.5s ease;
+    }
+
+    /* EFECTO CAOS PARA NIVELES SUPERIORES */
+    .cartas-grid.nivel-caos .carta:nth-child(even) {
+      transform: translateY(10px);
+    }
+
+    .cartas-grid.nivel-caos .carta:nth-child(odd) {
+      transform: translateY(-10px);
     }
 
     .carta {
       aspect-ratio: 3/4;
       border-radius: 12px;
       cursor: pointer;
-      perspective: 600px;
+      perspective: 800px;
       position: relative;
     }
 
@@ -120,7 +223,7 @@
       height: 100%;
       position: relative;
       transform-style: preserve-3d;
-      transition: transform .4s ease;
+      transition: transform .5s cubic-bezier(0.4, 0.0, 0.2, 1);
       border-radius: 12px;
     }
 
@@ -134,55 +237,42 @@
       position: absolute;
       inset: 0;
       border-radius: 12px;
-      display: flex;
-      align-items: center;
-      justify-content: center;
       backface-visibility: hidden;
       -webkit-backface-visibility: hidden;
-      border: 2px solid var(--border);
+      background-color: var(--st-dark);
+      background-size: cover;
+      background-position: center;
+      background-repeat: no-repeat;
     }
 
     .carta-dorso {
-      background: linear-gradient(135deg, var(--bg3), var(--bg2));
-      font-size: 2rem;
-      color: var(--border-b);
-    }
-
-    .carta-dorso::before {
-      content: '🎴';
-      font-size: 2rem;
+      background-image: url('images/dorso.jpg');
+      border: 2px solid #333;
+      box-shadow: 0 0 10px rgba(0, 0, 0, 0.8);
+      transition: border-color 0.3s, box-shadow 0.3s;
     }
 
     .carta-frente {
-      background: var(--bg2);
       transform: rotateY(180deg);
-      flex-direction: column;
-      gap: .5rem;
-      padding: .75rem;
-      text-align: center;
-      border-color: var(--violet);
-    }
-
-    .carta-emoji {
-      font-size: 2.5rem;
-    }
-
-    .carta-texto {
-      font-family: 'Press Start 2P', monospace;
-      font-size: .35rem;
-      color: white;
-      line-height: 1.6;
+      border: 2px solid var(--st-cyan);
+      box-shadow: 0 0 15px rgba(0, 243, 255, 0.4);
+      filter: contrast(1.1) brightness(0.9);
     }
 
     .carta.emparejada .carta-frente {
-      border-color: var(--green);
-      background: rgba(34, 197, 94, .08);
-      animation: emparejadoPop .3s cubic-bezier(.34, 1.56, .64, 1);
+      border-color: #22c55e;
+      box-shadow: 0 0 20px rgba(34, 197, 94, 0.8);
+      filter: contrast(1.2) brightness(1.1);
+      animation: emparejadoPop .4s cubic-bezier(.34, 1.56, .64, 1);
     }
 
     @keyframes emparejadoPop {
       0% {
         transform: rotateY(180deg) scale(.9)
+      }
+
+      50% {
+        transform: rotateY(180deg) scale(1.05)
       }
 
       100% {
@@ -191,7 +281,8 @@
     }
 
     .carta:hover:not(.volteada):not(.emparejada) .carta-dorso {
-      border-color: var(--violet);
+      border-color: var(--st-red);
+      box-shadow: 0 0 15px var(--st-red);
     }
 
     /* RESULTADO */
@@ -199,8 +290,8 @@
       position: fixed;
       inset: 0;
       z-index: 10000;
-      background: rgba(7, 7, 26, .92);
-      backdrop-filter: blur(10px);
+      background: rgba(0, 0, 0, .95);
+      backdrop-filter: blur(5px);
       display: flex;
       align-items: center;
       justify-content: center;
@@ -215,20 +306,21 @@
     }
 
     .resultado-modal {
-      background: var(--bg2);
-      border: 1px solid var(--border-b);
+      background: var(--st-panel);
+      border: 2px solid var(--st-red);
       border-radius: 20px;
       padding: 2.5rem;
       text-align: center;
-      max-width: 380px;
+      max-width: 400px;
       width: 90%;
-      box-shadow: 0 0 60px rgba(236, 72, 153, .25);
+      box-shadow: 0 0 40px var(--st-red-glow), inset 0 0 20px rgba(229, 9, 20, 0.2);
     }
 
     .resultado-titulo {
       font-family: 'Press Start 2P', monospace;
       font-size: .9rem;
       color: white;
+      text-shadow: 0 0 10px var(--st-red);
       margin-bottom: .75rem;
       line-height: 1.5;
     }
@@ -236,16 +328,29 @@
     .resultado-coins {
       font-family: 'Press Start 2P', monospace;
       font-size: 2rem;
-      color: var(--yellow);
+      color: #ffd700;
+      text-shadow: 0 0 10px rgba(255, 215, 0, 0.5);
       margin: .875rem 0;
       display: block;
     }
 
     .resultado-sub {
       font-size: .875rem;
-      color: var(--text-dim);
+      color: #ccc;
       font-weight: 700;
       margin-bottom: 1.5rem;
+    }
+
+    /* ESTILO PARA EL DEMOGORGON PARA QUE NO PAREZCA UN CUADRADO */
+    #demogorgon-img {
+      display: none;
+      width: 250px;
+      height: 250px;
+      margin: 0 auto 1.5rem auto;
+      object-fit: contain;
+      mix-blend-mode: screen;
+      -webkit-mask-image: radial-gradient(circle, black 50%, transparent 100%);
+      mask-image: radial-gradient(circle, black 50%, transparent 100%);
     }
 
     .resultado-btns {
@@ -257,52 +362,60 @@
 
     .btn-play {
       padding: .75rem 1.5rem;
-      background: linear-gradient(135deg, var(--pink), #be185d);
+      background: transparent;
       color: white;
-      border: none;
-      border-radius: 10px;
+      border: 2px solid var(--st-red);
+      box-shadow: 0 0 10px var(--st-red-glow), inset 0 0 10px var(--st-red-glow);
+      border-radius: 8px;
       cursor: pointer;
       font-family: 'Press Start 2P', monospace;
       font-size: .48rem;
       transition: all .2s;
+      text-transform: uppercase;
     }
 
     .btn-play:hover {
+      background: var(--st-red);
+      color: white;
       transform: translateY(-2px);
-      box-shadow: 0 6px 20px rgba(236, 72, 153, .5);
+      box-shadow: 0 6px 20px var(--st-red);
     }
 
     .btn-volver {
       padding: .75rem 1.5rem;
-      background: var(--bg3);
-      border: 1px solid var(--border);
-      border-radius: 10px;
+      background: rgba(0, 0, 0, 0.5);
+      border: 1px solid #555;
+      border-radius: 8px;
       cursor: pointer;
-      color: var(--text);
+      color: #ddd;
       font-family: 'Press Start 2P', monospace;
       font-size: .48rem;
       text-decoration: none;
       display: inline-flex;
       align-items: center;
-      transition: border-color .2s;
+      transition: all .2s;
+      text-transform: uppercase;
     }
 
     .btn-volver:hover {
-      border-color: var(--violet);
+      border-color: white;
+      color: white;
     }
   </style>
 </head>
 
 <body>
+  <div id="ash-fall"></div>
+
   <div class="game-topbar">
-    <a href="../juegos.html" class="game-back-btn">← Volver</a>
-    <span class="game-title">🃏 MEMORIA</span>
-    <span class="game-timer">⏱ <span id="timerTxt">00:00</span></span>
+    <a href="../juegos.html" class="game-back-btn">← ESCAPAR</a>
+    <span class="game-title">MEMORIA</span>
+    <span class="game-timer" id="timerContainer">⏱ <span id="timerTxt">00:00</span></span>
   </div>
 
   <div class="game-wrap">
     <div class="meta-bar">
-      <div class="meta-item"><span class="meta-label">PARES</span><span class="meta-val" id="paresVal">0/8</span></div>
+      <div class="meta-item"><span class="meta-label">PARES</span><span class="meta-val" id="paresVal">0/0</span></div>
       <div class="meta-item"><span class="meta-label">INTENTOS</span><span class="meta-val" id="intentosVal">0</span>
       </div>
       <div class="meta-item"><span class="meta-label">NIVEL</span><span class="meta-val" id="nivelVal">1</span></div>
@@ -312,11 +425,14 @@
 
   <div class="resultado-overlay" id="resultadoOverlay">
     <div class="resultado-modal">
-      <div class="resultado-titulo" id="resTitulo">🎉 ¡COMPLETADO!</div>
+      <div class="resultado-titulo" id="resTitulo">🎉 ¡SOBREVIVISTE!</div>
+
+      <img id="demogorgon-img" src="images/demogorgon.gif" alt="Demogorgon">
+
       <span class="resultado-coins" id="resCoins">0 🪙</span>
       <div class="resultado-sub" id="resSub">—</div>
       <div class="resultado-btns">
-        <button class="btn-play" id="btnDenuevo">↺ Jugar de nuevo</button>
+        <button class="btn-play" id="btnAccion">Siguiente Nivel ➔</button>
         <a href="../juegos.html" class="btn-volver">← Lobby</a>
       </div>
     </div>
@@ -324,54 +440,95 @@
 
   <script src="../../shared/shared.js"></script>
   <script>
-    // Pares de concepto + definición (asignaturas variadas)
-    var PARES_POOL = [
-      { emoji: '➕', texto: 'SUMA' }, { emoji: '2+2', texto: 'CUATRO' },
-      { emoji: '🌍', texto: 'PLANETA' }, { emoji: '☀️', texto: 'ESTRELLA' },
-      { emoji: '📖', texto: 'LIBRO' }, { emoji: '✏️', texto: 'LÁPIZ' },
-      { emoji: '💧', texto: 'AGUA' }, { emoji: '🔥', texto: 'FUEGO' },
-      { emoji: '🌱', texto: 'PLANTA' }, { emoji: '🐋', texto: 'MAMÍFERO' },
-      { emoji: '⚗️', texto: 'QUÍMICA' }, { emoji: '🏔️', texto: 'MONTAÑA' },
-      { emoji: '🎵', texto: 'MÚSICA' }, { emoji: '🎨', texto: 'ARTE' },
-      { emoji: '🧮', texto: 'CÁLCULO' }, { emoji: '📐', texto: 'GEOMETRÍA' },
-    ];
+    // Pool de 30 imágenes del 1.jpg al 30.jpg
+    var PARES_POOL = [];
+    for (var i = 1; i <= 30; i++) {
+      PARES_POOL.push(i + '.jpg');
+    }
 
-    var STATE = { cartas: [], volteadas: [], emparejadas: 0, intentos: 0, bloqueado: false, nivel: 1, timerSeg: 0, timerInt: null, iniciado: false };
+    var STATE = {
+      cartas: [],
+      volteadas: [],
+      emparejadas: 0,
+      intentos: 0,
+      bloqueado: false,
+      nivel: 1,
+      timerSeg: 0,
+      timerInt: null,
+      iniciado: false
+    };
 
     document.addEventListener('DOMContentLoaded', function () {
+      generarCenizas();
       iniciarJuego();
-      document.getElementById('btnDenuevo').addEventListener('click', function () {
+
+      document.getElementById('btnAccion').addEventListener('click', function () {
         document.getElementById('resultadoOverlay').classList.remove('active');
-        STATE.nivel++;
         iniciarJuego();
       });
     });
 
+    function generarCenizas() {
+      var ashContainer = document.getElementById('ash-fall');
+      var ashCount = window.innerWidth < 600 ? 50 : 120; // Densidad de cenizas
+
+      for (var i = 0; i < ashCount; i++) {
+        var ash = document.createElement('div');
+        ash.classList.add('ash');
+        ash.style.left = Math.random() * 100 + 'vw';
+        // Animación más lenta y flotante para las cenizas
+        ash.style.animationDuration = (Math.random() * 4 + 4) + 's';
+        ash.style.animationDelay = (Math.random() * 5) + 's';
+        var scale = Math.random() * 0.7 + 0.3;
+        ash.style.transform = 'scale(' + scale + ')';
+        ashContainer.appendChild(ash);
+      }
+    }
+
     function iniciarJuego() {
       clearInterval(STATE.timerInt);
-      STATE.volteadas = []; STATE.emparejadas = 0; STATE.intentos = 0; STATE.bloqueado = false; STATE.timerSeg = 0; STATE.iniciado = false;
+      STATE.volteadas = [];
+      STATE.emparejadas = 0;
+      STATE.intentos = 0;
+      STATE.bloqueado = false;
+      STATE.iniciado = false;
 
-      var totalPares = Math.min(4 + STATE.nivel, 8);
+      // Temporizador: Empieza en 45s. Cada 2 niveles suma 5s.
+      var bonificacionTiempo = Math.floor((STATE.nivel - 1) / 2) * 5;
+      STATE.timerSeg = 45 + bonificacionTiempo;
+
+      document.getElementById('timerContainer').classList.remove('peligro');
+      actualizarRelojUI();
+
+      // Cantidad de cartas: Nivel 1 = 4 pares. Sube 2 pares por nivel hasta un máximo de 15 pares (30 cartas)
+      var totalPares = Math.min(4 + ((STATE.nivel - 1) * 1), 15);
+
       var pool = shuffleArr(PARES_POOL.slice()).slice(0, totalPares);
       var cartas = [];
-      pool.forEach(function (p, i) {
-        cartas.push({ id: 'c' + i + 'a', parId: i, tipo: 'emoji', contenido: p.emoji, emparejada: false });
-        cartas.push({ id: 'c' + i + 'b', parId: i, tipo: 'texto', contenido: p.texto, emparejada: false });
+
+      pool.forEach(function (img, i) {
+        cartas.push({ id: 'c' + i + 'a', contenido: img, emparejada: false });
+        cartas.push({ id: 'c' + i + 'b', contenido: img, emparejada: false });
       });
       STATE.cartas = shuffleArr(cartas);
 
-      var cols = totalPares <= 4 ? 4 : totalPares <= 6 ? 4 : 4;
+      var cols = totalPares <= 4 ? 4 : (totalPares <= 8 ? 4 : 5);
+      if (window.innerWidth < 600) cols = totalPares <= 4 ? 4 : 4;
+
       var grid = document.getElementById('cartasGrid');
       grid.style.gridTemplateColumns = 'repeat(' + cols + ',1fr)';
+
+      if (STATE.nivel >= 2) {
+        grid.classList.add('nivel-caos');
+      } else {
+        grid.classList.remove('nivel-caos');
+      }
+
       grid.innerHTML = STATE.cartas.map(function (c) {
         return '<div class="carta" data-id="' + c.id + '">' +
           '<div class="carta-inner">' +
           '<div class="carta-dorso"></div>' +
-          '<div class="carta-frente">' +
-          (c.tipo === 'emoji'
-            ? '<span class="carta-emoji">' + c.contenido + '</span>'
-            : '<span class="carta-texto">' + c.contenido + '</span>') +
-          '</div>' +
+          '<div class="carta-frente" style="background-image: url(\'images/' + c.contenido + '\');"></div>' +
           '</div>' +
           '</div>';
       }).join('');
@@ -384,6 +541,12 @@
       document.getElementById('nivelVal').textContent = STATE.nivel;
     }
 
+    function actualizarRelojUI() {
+      var m = Math.floor(STATE.timerSeg / 60);
+      var s = STATE.timerSeg % 60;
+      document.getElementById('timerTxt').textContent = pad(m) + ':' + pad(s);
+    }
+
     function clickCarta(id) {
       if (STATE.bloqueado) return;
       var carta = STATE.cartas.find(function (c) { return c.id === id; });
@@ -392,9 +555,16 @@
       if (!STATE.iniciado) {
         STATE.iniciado = true;
         STATE.timerInt = setInterval(function () {
-          STATE.timerSeg++;
-          var m = Math.floor(STATE.timerSeg / 60), s = STATE.timerSeg % 60;
-          document.getElementById('timerTxt').textContent = pad(m) + ':' + pad(s);
+          STATE.timerSeg--;
+          actualizarRelojUI();
+
+          if (STATE.timerSeg <= 10) {
+            document.getElementById('timerContainer').classList.add('peligro');
+          }
+
+          if (STATE.timerSeg <= 0) {
+            perder();
+          }
         }, 1000);
       }
 
@@ -406,7 +576,8 @@
         STATE.bloqueado = true;
         var c1 = STATE.cartas.find(function (c) { return c.id === STATE.volteadas[0]; });
         var c2 = STATE.cartas.find(function (c) { return c.id === STATE.volteadas[1]; });
-        if (c1.parId === c2.parId) {
+
+        if (c1.contenido === c2.contenido) {
           c1.emparejada = c2.emparejada = true;
           document.querySelector('.carta[data-id="' + c1.id + '"]').classList.add('emparejada');
           document.querySelector('.carta[data-id="' + c2.id + '"]').classList.add('emparejada');
@@ -414,7 +585,9 @@
           STATE.volteadas = [];
           STATE.bloqueado = false;
           actualizarMeta();
-          if (STATE.emparejadas === STATE.cartas.length / 2) terminar();
+          if (STATE.emparejadas === STATE.cartas.length / 2) {
+            setTimeout(ganar, 500);
+          }
         } else {
           setTimeout(function () {
             STATE.volteadas.forEach(function (vid) {
@@ -428,6 +601,54 @@
       } else {
         actualizarMeta();
       }
+    }
+
+    function perder() {
+      clearInterval(STATE.timerInt);
+      STATE.bloqueado = true;
+
+      document.getElementById('resTitulo').textContent = '💀 EL TIEMPO SE AGOTÓ';
+      document.getElementById('resTitulo').style.color = 'var(--st-red)';
+      document.getElementById('demogorgon-img').style.display = 'block';
+      document.getElementById('resCoins').style.display = 'none';
+      document.getElementById('resSub').textContent = 'El Demogorgon te atrapó en el nivel ' + STATE.nivel;
+
+      var btn = document.getElementById('btnAccion');
+      btn.textContent = '↺ Reiniciar Nivel';
+      btn.onclick = function () {
+        document.getElementById('resultadoOverlay').classList.remove('active');
+        iniciarJuego();
+      };
+
+      document.getElementById('resultadoOverlay').classList.add('active');
+    }
+
+    function ganar() {
+      clearInterval(STATE.timerInt);
+      STATE.bloqueado = true;
+
+      var totalPares = STATE.cartas.length / 2;
+      var precision = Math.round((totalPares / STATE.intentos) * 100);
+      var recompensa = Math.min(200, 50 + Math.round(precision * 0.8) + Math.round(STATE.timerSeg * 1.5));
+
+      document.getElementById('resTitulo').textContent = precision >= 90 ? '🌟 ¡IMPECABLE!' : '🎉 ¡SOBREVIVISTE!';
+      document.getElementById('resTitulo').style.color = 'white';
+      document.getElementById('demogorgon-img').style.display = 'none';
+      document.getElementById('resCoins').style.display = 'block';
+      document.getElementById('resCoins').textContent = '+' + recompensa + ' 🪙';
+      document.getElementById('resSub').textContent = 'Precisión: ' + precision + '% | Tiempo Restante: ' + STATE.timerSeg + 's';
+
+      var btn = document.getElementById('btnAccion');
+      btn.textContent = 'Siguiente Nivel ➔';
+      btn.onclick = function () {
+        document.getElementById('resultadoOverlay').classList.remove('active');
+        STATE.nivel++;
+        iniciarJuego();
+      };
+
+      document.getElementById('resultadoOverlay').classList.add('active');
+
+      guardarProgresoBD(recompensa);
     }
 
     function getTokenLuego(callback) {
@@ -444,17 +665,7 @@
       }, 200);
     }
 
-    function terminar() {
-      clearInterval(STATE.timerInt);
-      var totalPares = STATE.cartas.length / 2;
-      var precision = Math.round((totalPares / STATE.intentos) * 100);
-      var tiempoBonus = Math.max(0, 60 - STATE.timerSeg);
-      var recompensa = Math.min(200, 50 + Math.round(precision * 0.8) + Math.round(tiempoBonus * 0.5));
-
-      document.getElementById('resTitulo').textContent = precision >= 90 ? '🌟 ¡PERFECTO!' : '🎉 ¡COMPLETADO!';
-      document.getElementById('resCoins').textContent = '+' + recompensa + ' 🪙';
-      document.getElementById('resSub').textContent = 'Precisión: ' + precision + '% | Tiempo: ' + document.getElementById('timerTxt').textContent;
-      document.getElementById('resultadoOverlay').classList.add('active');
+    function guardarProgresoBD(recompensa) {
       toast('+' + recompensa + ' EduCoins ganados 🃏', 'coins');
       var _sid = sessionStorage.getItem('juego_session_id');
       var _jid = sessionStorage.getItem('juego_id');
@@ -484,6 +695,7 @@
       document.getElementById('paresVal').textContent = STATE.emparejadas + '/' + (STATE.cartas.length / 2);
       document.getElementById('intentosVal').textContent = STATE.intentos;
     }
+
     function shuffleArr(a) { for (var i = a.length - 1; i > 0; i--) { var j = Math.floor(Math.random() * (i + 1)); var t = a[i]; a[i] = a[j]; a[j] = t; } return a; }
     function pad(n) { return String(n).padStart(2, '0'); }
   </script>
