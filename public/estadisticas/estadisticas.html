@@ -734,7 +734,7 @@
         html += '<div class="eval-grupo">';
         html += '<div class="eval-grupo-header" onclick="toggleEvalGrupo(' + gi + ')" id="eval-header-' + gi + '">';
         html += '<div class="eval-grupo-titulo">' + am.emoji + ' ' + g.nombre + (us ? ' <span style="font-size:.7rem;color:var(--text-dim);font-weight:700;">· ' + us + '</span>' : '') + '</div>';
-        html += '<div class="eval-grupo-meta"><span class="eval-badge-asig">' + g.asignatura + '</span><span class="eval-badge-intentos">' + ti + ' intento' + (ti !== 1 ? 's' : '') + '</span><span style="font-size:.75rem;font-weight:900;color:' + pc + ';">Prom: ' + pr + '</span><span class="eval-toggle" id="eval-toggle-' + gi + '">▼</span></div>';
+        html += '<div class="eval-grupo-meta"><span class="eval-badge-asig">' + g.asignatura + '</span><span class="eval-badge-intentos">' + ti + ' intento' + (ti !== 1 ? 's' : '') + '</span><span style="font-size:.75rem;font-weight:900;color:' + pc + ';">Prom: ' + pr + '</span><a href="' + BASE_URL + '/evaluaciones/preparacion.html?id=' + g.prueba_id + '" style="font-size:.7rem;font-weight:900;padding:.2rem .55rem;border-radius:6px;background:rgba(99,102,241,.15);color:#818cf8;border:1px solid rgba(99,102,241,.3);text-decoration:none;white-space:nowrap;flex-shrink:0;" onclick="event.stopPropagation()">🔁 Repetir</a><span class="eval-toggle" id="eval-toggle-' + gi + '">▼</span></div>';
         html += '</div>';
         html += '<div id="eval-tabla-' + gi + '" style="display:none;"><div class="eval-tabla-wrap"><table class="eval-tabla">';
         html += '<thead><tr><th>N°</th><th>Fecha</th><th>Correctas</th><th>Incorrectas</th><th>Total</th><th>%</th><th>Nota</th></tr></thead><tbody>';
