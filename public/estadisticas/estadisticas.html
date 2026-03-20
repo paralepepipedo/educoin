@@ -1,22 +1,8 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html lang="es">
 
 <head>
-  <!--
-============================================
-ARCHIVO: /estadisticas/estadisticas.html
-VERSIÓN: 1.1.0 — 2026-03-08
-Changelog:
-  1.1.0 - Fix timing: polling CLERK_TOKEN en vez de clerkReady
-          Agregar credentials:include a todos los fetches
-Usa los endpoints reales:
-  GET /api/perfil
-  GET /api/juegos              (partidas de hoy + niveles)
-  GET /api/evaluaciones        (notas por asignatura)
-  GET /api/misiones            (diarias + semanales del día)
-  GET /api/ranking?mi_posicion=1
-============================================
--->
+  <!-- ARCHIVO: /estadisticas/estadisticas.html VERSIÓN: 1.2.0 — 2026-03-18 -->
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width,initial-scale=1.0" />
   <title>Estadísticas — EduCoins</title>
@@ -25,8 +11,8 @@ Usa los endpoints reales:
     rel="stylesheet" />
   <link rel="stylesheet" href="../shared/shared.css" />
   <script data-clerk-publishable-key="pk_test_bG92aW5nLXJhcHRvci0xLmNsZXJrLmFjY291bnRzLmRldiQ"
-    src="https://cdn.jsdelivr.net/npm/@clerk/clerk-js@latest/dist/clerk.browser.js"></script>
-
+    src="https://lovable-raptor-1.clerk.accounts.dev/npm/@clerk/clerk-js@latest/dist/clerk.browser.js"
+    crossorigin="anonymous"></script>
   <style>
     .page-header {
       display: flex;
@@ -34,7 +20,7 @@ Usa los endpoints reales:
       justify-content: space-between;
       margin-bottom: 1.5rem;
       flex-wrap: wrap;
-      gap: 1rem;
+      gap: 1rem
     }
 
     .page-tag {
@@ -42,7 +28,7 @@ Usa los endpoints reales:
       font-size: .4rem;
       color: var(--cyan);
       display: block;
-      margin-bottom: .5rem;
+      margin-bottom: .5rem
     }
 
     .page-title {
@@ -50,21 +36,20 @@ Usa los endpoints reales:
       font-size: clamp(.75rem, 2vw, 1rem);
       color: white;
       line-height: 1.5;
-      margin-bottom: .4rem;
+      margin-bottom: .4rem
     }
 
     .page-subtitle {
       font-size: .875rem;
       color: var(--text-dim);
-      font-weight: 700;
+      font-weight: 700
     }
 
-    /* KPIs */
     .kpis-grid {
       display: grid;
       grid-template-columns: repeat(4, 1fr);
       gap: 1rem;
-      margin-bottom: 1.75rem;
+      margin-bottom: 1.75rem
     }
 
     .kpi-card {
@@ -74,12 +59,12 @@ Usa los endpoints reales:
       padding: 1.25rem;
       position: relative;
       overflow: hidden;
-      transition: all .2s;
+      transition: all .2s
     }
 
     .kpi-card:hover {
       transform: translateY(-2px);
-      border-color: var(--violet);
+      border-color: var(--violet)
     }
 
     .kpi-card::before {
@@ -89,14 +74,14 @@ Usa los endpoints reales:
       left: 0;
       right: 0;
       height: 3px;
-      background: linear-gradient(90deg, var(--k-color, var(--violet)), transparent);
+      background: linear-gradient(90deg, var(--k-color, var(--violet)), transparent)
     }
 
     .kpi-label {
       font-family: 'Press Start 2P', monospace;
       font-size: .35rem;
       color: var(--text-muted);
-      margin-bottom: .5rem;
+      margin-bottom: .5rem
     }
 
     .kpi-num {
@@ -104,24 +89,24 @@ Usa los endpoints reales:
       font-size: .9rem;
       color: white;
       margin-bottom: .25rem;
-      min-height: 1.2em;
+      min-height: 1.2em
     }
 
     .kpi-delta {
       font-size: .75rem;
-      font-weight: 800;
+      font-weight: 800
     }
 
     .kpi-delta.up {
-      color: var(--green);
+      color: var(--green)
     }
 
     .kpi-delta.down {
-      color: var(--red);
+      color: var(--red)
     }
 
     .kpi-delta.neutral {
-      color: var(--text-muted);
+      color: var(--text-muted)
     }
 
     .kpi-icon {
@@ -129,12 +114,11 @@ Usa los endpoints reales:
       top: 1rem;
       right: 1rem;
       font-size: 1.5rem;
-      opacity: .4;
+      opacity: .4
     }
 
-    /* Barra XP nivel */
     .xp-wrap {
-      margin-top: .5rem;
+      margin-top: .5rem
     }
 
     .xp-track {
@@ -142,7 +126,7 @@ Usa los endpoints reales:
       background: rgba(255, 255, 255, .08);
       border-radius: 3px;
       overflow: hidden;
-      margin-top: .25rem;
+      margin-top: .25rem
     }
 
     .xp-fill {
@@ -150,7 +134,7 @@ Usa los endpoints reales:
       background: var(--cyan);
       border-radius: 3px;
       transition: width 1s ease;
-      width: 0%;
+      width: 0%
     }
 
     .xp-sub {
@@ -158,16 +142,15 @@ Usa los endpoints reales:
       justify-content: space-between;
       font-size: .6rem;
       color: var(--text-muted);
-      font-weight: 700;
+      font-weight: 700
     }
 
-    /* Skeleton */
     .skel {
       display: inline-block;
       background: linear-gradient(90deg, rgba(255, 255, 255, .05) 25%, rgba(255, 255, 255, .1) 50%, rgba(255, 255, 255, .05) 75%);
       background-size: 200% 100%;
       animation: shimmer 1.5s infinite;
-      border-radius: 4px;
+      border-radius: 4px
     }
 
     @keyframes shimmer {
@@ -180,63 +163,60 @@ Usa los endpoints reales:
       }
     }
 
-    /* Gráficos */
     .charts-grid {
       display: grid;
       grid-template-columns: 2fr 1fr;
       gap: 1.25rem;
-      margin-bottom: 1.75rem;
+      margin-bottom: 1.75rem
     }
 
     .chart-card {
       background: var(--card);
       border: 1px solid var(--border);
       border-radius: var(--radius);
-      padding: 1.5rem;
+      padding: 1.5rem
     }
 
     .chart-titulo {
       font-family: 'Press Start 2P', monospace;
       font-size: .5rem;
       color: white;
-      margin-bottom: 1.25rem;
+      margin-bottom: 1.25rem
     }
 
     canvas {
-      display: block;
+      display: block
     }
 
-    /* Empty state */
     .empty-state {
       text-align: center;
       padding: 2rem 1rem;
-      color: var(--text-muted);
+      color: var(--text-muted)
     }
 
     .empty-state .empty-icon {
       font-size: 2rem;
       margin-bottom: .5rem;
-      display: block;
+      display: block
     }
 
     .empty-state p {
       font-size: .8rem;
       font-weight: 700;
-      margin: 0;
+      margin: 0
     }
 
-    /* Asignaturas */
     .asig-lista {
       display: flex;
       flex-direction: column;
-      gap: .875rem;
+      gap: .875rem
     }
 
     .asig-header {
       display: flex;
       justify-content: space-between;
       align-items: center;
-      margin-bottom: .35rem;
+      margin-bottom: .35rem
     }
 
     .asig-nombre {
@@ -245,89 +225,39 @@ Usa los endpoints reales:
       color: var(--text);
       display: flex;
       align-items: center;
-      gap: .5rem;
+      gap: .5rem
     }
 
     .asig-track {
       height: 8px;
       background: rgba(255, 255, 255, .06);
       border-radius: 4px;
-      overflow: hidden;
+      overflow: hidden
     }
 
     .asig-fill {
       height: 100%;
       border-radius: 4px;
-      transition: width 1.2s ease;
+      transition: width 1.2s ease
     }
 
     .asig-nota {
       font-size: .7rem;
       font-weight: 800;
       padding: .15rem .45rem;
-      border-radius: .25rem;
+      border-radius: .25rem
     }
 
     .asig-meta {
       font-size: .7rem;
       color: var(--text-muted);
-      font-weight: 700;
+      font-weight: 700
     }
 
-    /* Logros */
-    .logros-lista {
-      display: flex;
-      flex-direction: column;
-      gap: .5rem;
-    }
-
-    .logro-row {
-      background: var(--card);
-      border: 1px solid var(--border);
-      border-radius: var(--radius-sm);
-      padding: .75rem 1.25rem;
-      display: flex;
-      align-items: center;
-      gap: 1rem;
-      transition: .2s;
-    }
-
-    .logro-row:hover {
-      border-color: var(--violet);
-    }
-
-    .logro-emoji {
-      font-size: 1.5rem;
-    }
-
-    .logro-info {
-      flex: 1;
-    }
-
-    .logro-nombre {
-      font-weight: 800;
-      font-size: .85rem;
-      color: var(--text);
-    }
-
-    .logro-fecha {
-      font-size: .72rem;
-      color: var(--text-dim);
-      font-weight: 700;
-    }
-
-    .logro-xp {
-      font-family: 'Press Start 2P', monospace;
-      font-size: .42rem;
-      color: var(--cyan);
-      white-space: nowrap;
-    }
-
-    /* Stats grid */
     .stats-grid {
       display: grid;
       grid-template-columns: repeat(2, 1fr);
-      gap: 1rem;
+      gap: 1rem
     }
 
     .stat-box {
@@ -335,23 +265,22 @@ Usa los endpoints reales:
       border: 1px solid var(--border);
       border-radius: var(--radius-sm);
       padding: 1rem;
-      text-align: center;
+      text-align: center
     }
 
     .stat-num {
       font-family: 'Press Start 2P', monospace;
       font-size: .75rem;
       display: block;
-      margin-bottom: .3rem;
+      margin-bottom: .3rem
     }
 
     .stat-label {
       font-size: .7rem;
       color: var(--text-dim);
-      font-weight: 700;
+      font-weight: 700
     }
 
-    /* Ranking card */
     .ranking-card {
       background: var(--card);
       border: 1px solid var(--border);
@@ -360,90 +289,209 @@ Usa los endpoints reales:
       display: flex;
       gap: 1.5rem;
       align-items: center;
-      flex-wrap: wrap;
+      flex-wrap: wrap
     }
 
     .ranking-item {
       text-align: center;
       flex: 1;
-      min-width: 100px;
+      min-width: 100px
     }
 
     .ranking-pos {
       font-family: 'Press Start 2P', monospace;
       font-size: 1.4rem;
       display: block;
-      margin-bottom: .25rem;
+      margin-bottom: .25rem
     }
 
     .ranking-label {
       font-size: .72rem;
       color: var(--text-dim);
-      font-weight: 700;
+      font-weight: 700
     }
 
     .ranking-sub {
       font-size: .65rem;
       color: var(--text-muted);
       font-weight: 700;
-      margin-top: .15rem;
+      margin-top: .15rem
     }
 
     .section {
-      margin-bottom: 2rem;
+      margin-bottom: 2rem
     }
 
     .section-title {
       font-family: 'Press Start 2P', monospace;
       font-size: .6rem;
       color: white;
-      margin-bottom: 1.25rem;
+      margin-bottom: 1.25rem
     }
 
     .fade-up {
       opacity: 0;
       transform: translateY(18px);
-      animation: fadeUp .5s ease forwards;
+      animation: fadeUp .5s ease forwards
     }
 
     .delay-1 {
-      animation-delay: .08s;
+      animation-delay: .08s
     }
 
     .delay-2 {
-      animation-delay: .16s;
+      animation-delay: .16s
     }
 
     .delay-3 {
-      animation-delay: .24s;
+      animation-delay: .24s
     }
 
     .delay-4 {
-      animation-delay: .32s;
+      animation-delay: .32s
     }
 
     .delay-5 {
-      animation-delay: .40s;
+      animation-delay: .40s
     }
 
     @keyframes fadeUp {
       to {
         opacity: 1;
-        transform: translateY(0);
+        transform: translateY(0)
       }
+    }
+
+    /* EVALUACIONES IA */
+    .eval-grupo {
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      overflow: hidden;
+      margin-bottom: 1rem
+    }
+
+    .eval-grupo-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 1rem 1.25rem;
+      cursor: pointer;
+      background: rgba(0, 0, 0, 0.2);
+      transition: background .2s
+    }
+
+    .eval-grupo-header:hover {
+      background: rgba(124, 58, 237, 0.1)
+    }
+
+    .eval-grupo-titulo {
+      font-weight: 800;
+      font-size: .9rem;
+      color: var(--text);
+      display: flex;
+      align-items: center;
+      gap: .5rem
+    }
+
+    .eval-grupo-meta {
+      display: flex;
+      align-items: center;
+      gap: .75rem
+    }
+
+    .eval-badge-asig {
+      font-size: .65rem;
+      font-weight: 800;
+      padding: .2rem .5rem;
+      border-radius: 4px;
+      background: rgba(124, 58, 237, 0.15);
+      color: var(--violet-light)
+    }
+
+    .eval-badge-intentos {
+      font-size: .65rem;
+      font-weight: 700;
+      color: var(--text-dim)
+    }
+
+    .eval-toggle {
+      color: var(--text-dim);
+      font-size: .8rem
+    }
+
+    .eval-tabla-wrap {
+      overflow-x: auto;
+      padding: 0 1.25rem 1rem
+    }
+
+    .eval-tabla {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: .82rem
+    }
+
+    .eval-tabla th {
+      font-family: 'Press Start 2P', monospace;
+      font-size: .3rem;
+      color: var(--text-muted);
+      text-align: left;
+      padding: .5rem .75rem;
+      border-bottom: 1px solid var(--border);
+      white-space: nowrap
+    }
+
+    .eval-tabla td {
+      padding: .6rem .75rem;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.04);
+      color: var(--text);
+      font-weight: 700
+    }
+
+    .eval-tabla tr:last-child td {
+      border-bottom: none
+    }
+
+    .eval-tabla tr:hover td {
+      background: rgba(255, 255, 255, 0.02)
+    }
+
+    .nota-pill {
+      display: inline-block;
+      font-weight: 900;
+      font-size: .8rem;
+      padding: .15rem .5rem;
+      border-radius: 5px;
+      min-width: 36px;
+      text-align: center
+    }
+
+    .nota-pill.aprobado {
+      background: rgba(34, 197, 94, 0.15);
+      color: #22c55e
+    }
+
+    .nota-pill.regular {
+      background: rgba(249, 115, 22, 0.15);
+      color: #f97316
+    }
+
+    .nota-pill.reprobado {
+      background: rgba(239, 68, 68, 0.15);
+      color: #ef4444
     }
 
     @media(max-width:900px) {
       .charts-grid {
-        grid-template-columns: 1fr;
+        grid-template-columns: 1fr
       }
 
       .kpis-grid {
-        grid-template-columns: repeat(2, 1fr);
+        grid-template-columns: repeat(2, 1fr)
       }
 
       .stats-grid {
-        grid-template-columns: 1fr;
+        grid-template-columns: 1fr
       }
     }
   </style>
@@ -453,8 +501,6 @@ Usa los endpoints reales:
   <div id="sharedHeader"></div>
   <div class="layout">
     <main class="main">
-
-      <!-- HEADER -->
       <div class="page-header fade-up">
         <div>
           <span class="page-tag">📊 ESTADÍSTICAS</span>
@@ -463,8 +509,6 @@ Usa los endpoints reales:
         </div>
         <div id="lastUpdated" style="font-size:.7rem;color:var(--text-muted);font-weight:700;align-self:center;"></div>
       </div>
-
-      <!-- KPIs -->
       <div class="kpis-grid fade-up delay-1">
         <div class="kpi-card" style="--k-color:var(--yellow)">
           <div class="kpi-label">EDUCOINS TOTALES</div>
@@ -499,31 +543,25 @@ Usa los endpoints reales:
           <span class="kpi-icon">🎯</span>
         </div>
       </div>
-
-      <!-- GRÁFICOS -->
       <div class="charts-grid fade-up delay-2">
         <div class="chart-card">
           <div class="chart-titulo">📈 MONEDAS GANADAS HOY POR JUEGO</div>
           <canvas id="chartMonedas" height="160"></canvas>
-          <div id="chartMonedasEmpty" class="empty-state" style="display:none">
-            <span class="empty-icon">📊</span>
+          <div id="chartMonedasEmpty" class="empty-state" style="display:none"><span class="empty-icon">📊</span>
             <p>Sin partidas jugadas hoy</p>
           </div>
         </div>
         <div class="chart-card">
           <div class="chart-titulo">🎮 PARTIDAS DE HOY</div>
           <canvas id="chartJuegos" height="160"></canvas>
-          <div id="chartJuegosEmpty" class="empty-state" style="display:none">
-            <span class="empty-icon">🎮</span>
+          <div id="chartJuegosEmpty" class="empty-state" style="display:none"><span class="empty-icon">🎮</span>
             <p>Sin partidas hoy</p>
           </div>
         </div>
       </div>
-
-      <!-- RANKING -->
       <section class="section fade-up delay-2">
         <div class="section-title">🏆 MI POSICIÓN</div>
-        <div class="ranking-card" id="rankingCard">
+        <div class="ranking-card">
           <div class="ranking-item">
             <span class="ranking-pos" id="rankGlobal" style="color:var(--yellow)"><span class="skel"
                 style="width:50px;height:28px;display:block;margin:0 auto"></span></span>
@@ -546,8 +584,6 @@ Usa los endpoints reales:
           </div>
         </div>
       </section>
-
-      <!-- RENDIMIENTO POR ASIGNATURA -->
       <section class="section fade-up delay-3">
         <div class="section-title">📚 RENDIMIENTO POR ASIGNATURA</div>
         <div class="chart-card">
@@ -558,9 +594,17 @@ Usa los endpoints reales:
           </div>
         </div>
       </section>
-
-      <!-- MISIONES HOY + PERFIL DE JUEGO -->
-      <div class="charts-grid fade-up delay-4">
+      <section class="section fade-up delay-4">
+        <div class="section-title">🤖 EVALUACIONES IA</div>
+        <div id="evalIaContenido">
+          <div class="empty-state"
+            style="background:var(--card);border:1px solid var(--border);border-radius:var(--radius);padding:2rem;">
+            <span class="empty-icon">📋</span>
+            <p>Cargando historial...</p>
+          </div>
+        </div>
+      </section>
+      <div class="charts-grid fade-up delay-5">
         <section class="section" style="margin-bottom:0">
           <div class="section-title">📅 MISIONES DE HOY</div>
           <div class="stats-grid" id="misionesStats">
@@ -596,365 +640,134 @@ Usa los endpoints reales:
           </div>
         </section>
       </div>
-
     </main>
   </div>
   <div class="toast-container" id="toastContainer"></div>
-
   <script src="../auth/clerk-config.js"></script>
   <script src="../shared/clerk-guard.js"></script>
   <script src="../shared/shared.js"></script>
   <script>
-    // ============================================
-    // estadisticas.html — lógica inline
-    // Usa exactamente los mismos endpoints que
-    // el resto de páginas de EduCoins
-    // ============================================
-
-    var ASIG_META = {
-      'Matematicas': { emoji: '➗', color: '#3b82f6' },
-      'Lenguaje': { emoji: '📖', color: '#ef4444' },
-      'Historia': { emoji: '🏛️', color: '#f97316' },
-      'Ciencias': { emoji: '🔬', color: '#22c55e' },
-      'Ingles': { emoji: '🌎', color: '#06b6d4' },
-      'Ed. Fisica': { emoji: '⚽', color: '#84cc16' },
-      'Musica': { emoji: '🎵', color: '#ec4899' },
-      'Artes': { emoji: '🎨', color: '#a855f7' },
-      'Tecnologia': { emoji: '💻', color: '#64748b' },
-    };
-
-    // XP para subir de nivel (misma fórmula que backend: nivel * 1000)
-    function xpSiguienteNivel(nivel) { return nivel * 1000; }
-
-    var STATE = {
-      perfil: null,
-      juegos: null,   // respuesta completa de GET /api/juegos
-      evals: null,   // respuesta completa de GET /api/evaluaciones
-      misiones: null,   // respuesta completa de GET /api/misiones
-      ranking: null,   // respuesta de GET /api/ranking?mi_posicion=1
-    };
-
-    // ── DOMContentLoaded ─────────────────────────────────────
-    document.addEventListener('DOMContentLoaded', function () {
-      initShared('estadisticas');
-    });
-
-    // Polling: clerkReady puede haber ocurrido antes de que este script cargara
-    (function _waitToken(tries) {
-      if (window.CLERK_TOKEN) {
-        cargarTodo();
-      } else if (tries > 0) {
-        setTimeout(function () { _waitToken(tries - 1); }, 300);
-      }
-    })(20);
-
-    // ── Carga paralela de los 4 endpoints que ya existen ─────
+    var ASIG_META = { 'Matematicas': { emoji: '➗', color: '#3b82f6' }, 'Lenguaje': { emoji: '📖', color: '#ef4444' }, 'Historia': { emoji: '🏛️', color: '#f97316' }, 'Ciencias': { emoji: '🔬', color: '#22c55e' }, 'Ingles': { emoji: '🌎', color: '#06b6d4' }, 'Ed. Fisica': { emoji: '⚽', color: '#84cc16' }, 'Musica': { emoji: '🎵', color: '#ec4899' }, 'Artes': { emoji: '🎨', color: '#a855f7' }, 'Tecnologia': { emoji: '💻', color: '#64748b' } };
+    function xpSiguienteNivel(n) { return n * 1000; }
+    var STATE = { perfil: null, juegos: null, evals: null, misiones: null, ranking: null, evalIa: null };
+    document.addEventListener('DOMContentLoaded', function () { initShared('estadisticas'); });
+    (function _w(t) { if (window.CLERK_TOKEN) { cargarTodo(); } else if (t > 0) { setTimeout(function () { _w(t - 1); }, 300); } })(20);
     function cargarTodo() {
       var h = { 'Authorization': 'Bearer ' + window.CLERK_TOKEN };
-
       Promise.all([
-        // 1. Perfil: monedas, xp, nivel, racha_dias, rango_completo, sub_rango
-        fetch(BASE_URL + '/api/perfil', { credentials: 'include', headers: h })
-          .then(function (r) { return r.ok ? r.json() : null; }),
-
-        // 2. Juegos: partidas de hoy + niveles actuales por juego
-        fetch(BASE_URL + '/api/juegos', { credentials: 'include', headers: h })
-          .then(function (r) { return r.ok ? r.json() : null; }),
-
-        // 3. Evaluaciones: todas las del usuario (sin filtro de mes)
-        fetch(BASE_URL + '/api/evaluaciones', { credentials: 'include', headers: h })
-          .then(function (r) { return r.ok ? r.json() : null; }),
-
-        // 4. Misiones: diarias + semanales de hoy
-        fetch(BASE_URL + '/api/misiones', { credentials: 'include', headers: h })
-          .then(function (r) { return r.ok ? r.json() : null; }),
-
-        // 5. Ranking: posición global y por grado del alumno
-        fetch(BASE_URL + '/api/ranking?mi_posicion=1', { credentials: 'include', headers: h })
-          .then(function (r) { return r.ok ? r.json() : null; }),
-      ])
-        .then(function (res) {
-          STATE.perfil = res[0] || {};
-          STATE.juegos = res[1] || {};
-          STATE.evals = res[2] || {};
-          STATE.misiones = res[3] || {};
-          STATE.ranking = res[4] || {};
-
-          renderKPIs();
-          renderGraficoMonedas();
-          renderGraficoJuegos();
-          renderRanking();
-          renderAsignaturas();
-          renderMisiones();
-          renderJuegoStats();
-
-          document.getElementById('lastUpdated').textContent =
-            'Actualizado: ' + new Date().toLocaleTimeString('es-CL', { hour: '2-digit', minute: '2-digit' });
-        })
-        .catch(function (err) {
-          console.error('[estadisticas]', err);
-          toast('Error al cargar estadísticas', 'error');
-        });
+        fetch(BASE_URL + '/api/perfil', { credentials: 'include', headers: h }).then(function (r) { return r.ok ? r.json() : null; }),
+        fetch(BASE_URL + '/api/juegos', { credentials: 'include', headers: h }).then(function (r) { return r.ok ? r.json() : null; }),
+        fetch(BASE_URL + '/api/evaluaciones', { credentials: 'include', headers: h }).then(function (r) { return r.ok ? r.json() : null; }),
+        fetch(BASE_URL + '/api/misiones', { credentials: 'include', headers: h }).then(function (r) { return r.ok ? r.json() : null; }),
+        fetch(BASE_URL + '/api/ranking?mi_posicion=1', { credentials: 'include', headers: h }).then(function (r) { return r.ok ? r.json() : null; }),
+        fetch(BASE_URL + '/api/pruebas', { method: 'POST', credentials: 'include', headers: Object.assign({ 'Content-Type': 'application/json' }, h), body: JSON.stringify({ action: 'get_mis_intentos' }) }).then(function (r) { return r.ok ? r.json() : null; }),
+      ]).then(function (res) {
+        STATE.perfil = res[0] || {}; STATE.juegos = res[1] || {}; STATE.evals = res[2] || {}; STATE.misiones = res[3] || {}; STATE.ranking = res[4] || {}; STATE.evalIa = res[5] || {};
+        renderKPIs(); renderGraficoMonedas(); renderGraficoJuegos(); renderRanking(); renderAsignaturas(); renderEvalIa(); renderMisiones(); renderJuegoStats();
+        document.getElementById('lastUpdated').textContent = 'Actualizado: ' + new Date().toLocaleTimeString('es-CL', { hour: '2-digit', minute: '2-digit' });
+      }).catch(function (err) { console.error('[estadisticas]', err); toast('Error al cargar estadísticas', 'error'); });
     }
-
-    // ════════════════════════════════════════════════
-    // KPIs — datos de /api/perfil y /api/misiones
-    // ════════════════════════════════════════════════
     function renderKPIs() {
       var p = STATE.perfil;
-
-      // Monedas
       document.getElementById('kpiMonedas').textContent = Number(p.monedas || 0).toLocaleString('es-CL');
-      var monDelta = document.getElementById('kpiMonedasDelta');
-      // Monedas ganadas hoy: sumar partidas de hoy
-      var partidasHoy = STATE.juegos.partidas_hoy || [];
-      var monHoy = partidasHoy.reduce(function (acc, p) { return acc + (Number(p.monedas_ganadas) || 0); }, 0);
-      monDelta.className = 'kpi-delta ' + (monHoy > 0 ? 'up' : 'neutral');
-      monDelta.textContent = monHoy > 0 ? '↑ +' + monHoy + ' hoy' : 'Sin partidas hoy';
-
-      // XP + barra de nivel
-      var xp = Number(p.xp) || 0;
-      var nivel = Number(p.nivel) || 1;
+      var mD = document.getElementById('kpiMonedasDelta'), pH = STATE.juegos.partidas_hoy || [], mH = pH.reduce(function (a, x) { return a + (Number(x.monedas_ganadas) || 0); }, 0);
+      mD.className = 'kpi-delta ' + (mH > 0 ? 'up' : 'neutral'); mD.textContent = mH > 0 ? '↑ +' + mH + ' hoy' : 'Sin partidas hoy';
+      var xp = Number(p.xp) || 0, nv = Number(p.nivel) || 1;
       document.getElementById('kpiXp').textContent = xp.toLocaleString('es-CL');
-      var xpSig = xpSiguienteNivel(nivel);
-      var xpEnNivel = xp % xpSig;
-      var pct = Math.min(100, Math.round((xpEnNivel / xpSig) * 100));
-      document.getElementById('xpWrap').style.display = 'block';
-      document.getElementById('xpNivelLabel').textContent = 'Nv. ' + nivel;
-      document.getElementById('xpNextLabel').textContent = xpEnNivel.toLocaleString('es-CL') + ' / ' + xpSig.toLocaleString('es-CL') + ' XP';
+      var xpS = xpSiguienteNivel(nv), xpE = xp % xpS, pct = Math.min(100, Math.round((xpE / xpS) * 100));
+      document.getElementById('xpWrap').style.display = 'block'; document.getElementById('xpNivelLabel').textContent = 'Nv. ' + nv; document.getElementById('xpNextLabel').textContent = xpE.toLocaleString('es-CL') + ' / ' + xpS.toLocaleString('es-CL') + ' XP';
       setTimeout(function () { document.getElementById('xpFill').style.width = pct + '%'; }, 200);
-
-      // Racha
-      var racha = Number(p.racha_dias) || 0;
-      document.getElementById('kpiRacha').textContent = racha + ' días';
+      var r = Number(p.racha_dias) || 0; document.getElementById('kpiRacha').textContent = r + ' días';
       var rd = document.getElementById('kpiRachaDelta');
-      if (racha >= 30) { rd.className = 'kpi-delta up'; rd.textContent = '↑ Récord histórico 🔥'; }
-      else if (racha >= 7) { rd.className = 'kpi-delta up'; rd.textContent = '↑ ¡Sigue así!'; }
-      else if (racha > 0) { rd.className = 'kpi-delta neutral'; rd.textContent = 'Lleva ' + racha + ' días'; }
-      else { rd.className = 'kpi-delta down'; rd.textContent = 'Sin racha activa'; }
-
-      // Misiones de hoy
-      var misiones = STATE.misiones.misiones || [];
-      var completadas = misiones.filter(function (m) { return m.completada; }).length;
-      var total = misiones.length;
-      document.getElementById('kpiMisiones').textContent = completadas + '/' + total;
+      if (r >= 30) { rd.className = 'kpi-delta up'; rd.textContent = '↑ Récord histórico 🔥'; } else if (r >= 7) { rd.className = 'kpi-delta up'; rd.textContent = '↑ ¡Sigue así!'; } else if (r > 0) { rd.className = 'kpi-delta neutral'; rd.textContent = 'Lleva ' + r + ' días'; } else { rd.className = 'kpi-delta down'; rd.textContent = 'Sin racha activa'; }
+      var ms = STATE.misiones.misiones || [], comp = ms.filter(function (m) { return m.completada; }).length, tot = ms.length;
+      document.getElementById('kpiMisiones').textContent = comp + '/' + tot;
       var md = document.getElementById('kpiMisionesDelta');
-      if (total > 0 && completadas === total) {
-        md.className = 'kpi-delta up'; md.textContent = '🏆 ¡Todas completadas!';
-      } else if (completadas > 0) {
-        md.className = 'kpi-delta up'; md.textContent = '↑ ' + completadas + ' completada' + (completadas !== 1 ? 's' : '') + ' hoy';
-      } else {
-        md.className = 'kpi-delta neutral'; md.textContent = 'Sin misiones completadas hoy';
-      }
+      if (tot > 0 && comp === tot) { md.className = 'kpi-delta up'; md.textContent = '🏆 ¡Todas completadas!'; } else if (comp > 0) { md.className = 'kpi-delta up'; md.textContent = '↑ ' + comp + ' completada' + (comp !== 1 ? 's' : '') + ' hoy'; } else { md.className = 'kpi-delta neutral'; md.textContent = 'Sin misiones completadas hoy'; }
     }
-
-    // ════════════════════════════════════════════════
-    // GRÁFICO BARRAS — monedas ganadas por juego hoy
-    // Datos: STATE.juegos.partidas_hoy
-    // ════════════════════════════════════════════════
     function renderGraficoMonedas() {
-      var partidas = STATE.juegos.partidas_hoy || [];
-      var canvas = document.getElementById('chartMonedas');
-
-      // Agrupar monedas por juego_id
-      var mapa = {};
-      partidas.forEach(function (p) {
-        if (!p.juego_id) return;
-        mapa[p.juego_id] = (mapa[p.juego_id] || 0) + (Number(p.monedas_ganadas) || 0);
-      });
-
-      var colores = ['#facc15', '#22c55e', '#3b82f6', '#ef4444', '#a855f7', '#f97316'];
-      var datos = Object.entries(mapa)
-        .sort(function (a, b) { return b[1] - a[1]; }).slice(0, 6)
-        .map(function (e, i) { return { label: e[0], v: e[1], color: colores[i % colores.length] }; });
-
-      if (datos.length === 0 || !datos.some(function (d) { return d.v > 0; })) {
-        canvas.style.display = 'none';
-        document.getElementById('chartMonedasEmpty').style.display = 'block';
-        return;
-      }
-
-      dibujarBarras(canvas, datos);
+      var p = STATE.juegos.partidas_hoy || [], c = document.getElementById('chartMonedas'), m = {};
+      p.forEach(function (x) { if (!x.juego_id) return; m[x.juego_id] = (m[x.juego_id] || 0) + (Number(x.monedas_ganadas) || 0); });
+      var cl = ['#facc15', '#22c55e', '#3b82f6', '#ef4444', '#a855f7', '#f97316'];
+      var d = Object.entries(m).sort(function (a, b) { return b[1] - a[1]; }).slice(0, 6).map(function (e, i) { return { label: e[0], v: e[1], color: cl[i % cl.length] }; });
+      if (d.length === 0 || !d.some(function (x) { return x.v > 0; })) { c.style.display = 'none'; document.getElementById('chartMonedasEmpty').style.display = 'block'; return; }
+      dibujarBarras(c, d);
     }
-
-    // ════════════════════════════════════════════════
-    // GRÁFICO BARRAS — partidas por juego hoy
-    // ════════════════════════════════════════════════
     function renderGraficoJuegos() {
-      var partidas = STATE.juegos.partidas_hoy || [];
-      var canvas = document.getElementById('chartJuegos');
-
-      var conteo = {};
-      partidas.forEach(function (p) {
-        if (!p.juego_id) return;
-        conteo[p.juego_id] = (conteo[p.juego_id] || 0) + 1;
-      });
-
-      var colores = ['#3b82f6', '#22c55e', '#ef4444', '#a855f7', '#f97316', '#06b6d4'];
-      var datos = Object.entries(conteo)
-        .sort(function (a, b) { return b[1] - a[1]; }).slice(0, 6)
-        .map(function (e, i) { return { label: e[0], v: e[1], color: colores[i % colores.length] }; });
-
-      if (datos.length === 0) {
-        canvas.style.display = 'none';
-        document.getElementById('chartJuegosEmpty').style.display = 'block';
-        return;
-      }
-
-      dibujarBarras(canvas, datos);
+      var p = STATE.juegos.partidas_hoy || [], c = document.getElementById('chartJuegos'), ct = {};
+      p.forEach(function (x) { if (!x.juego_id) return; ct[x.juego_id] = (ct[x.juego_id] || 0) + 1; });
+      var cl = ['#3b82f6', '#22c55e', '#ef4444', '#a855f7', '#f97316', '#06b6d4'];
+      var d = Object.entries(ct).sort(function (a, b) { return b[1] - a[1]; }).slice(0, 6).map(function (e, i) { return { label: e[0], v: e[1], color: cl[i % cl.length] }; });
+      if (d.length === 0) { c.style.display = 'none'; document.getElementById('chartJuegosEmpty').style.display = 'block'; return; }
+      dibujarBarras(c, d);
     }
-
-    // Helper compartido para dibujar barras
     function dibujarBarras(canvas, datos) {
-      canvas.width = canvas.parentElement.clientWidth - 48;
-      var ctx = canvas.getContext('2d');
-      var W = canvas.width, H = canvas.height;
-      var padL = 10, padR = 10, padT = 20, padB = 40;
-      var maxV = Math.max.apply(null, datos.map(function (d) { return d.v; })) || 1;
-      var gap = (W - padL - padR) / datos.length;
-      var barW = gap * 0.6;
-
-      ctx.clearRect(0, 0, W, H);
-      datos.forEach(function (d, i) {
-        var x = padL + i * gap + (gap - barW) / 2;
-        var barH = (d.v / maxV) * (H - padT - padB);
-        var y = H - padB - barH;
-        ctx.fillStyle = d.color + '33'; ctx.fillRect(x, padT, barW, H - padT - padB);
-        ctx.fillStyle = d.color; ctx.fillRect(x, y, barW, barH);
-        ctx.fillStyle = 'white'; ctx.font = 'bold 11px Nunito'; ctx.textAlign = 'center';
-        ctx.fillText(d.v, x + barW / 2, y - 6);
-        var label = d.label.length > 9 ? d.label.slice(0, 8) + '.' : d.label;
-        ctx.fillStyle = 'rgba(148,163,184,.8)'; ctx.font = '9px Nunito';
-        ctx.fillText(label, x + barW / 2, H - 8);
-      });
+      canvas.width = canvas.parentElement.clientWidth - 48; var ctx = canvas.getContext('2d'); var W = canvas.width, H = canvas.height;
+      var pL = 10, pR = 10, pT = 20, pB = 40, mx = Math.max.apply(null, datos.map(function (d) { return d.v; })) || 1;
+      var gap = (W - pL - pR) / datos.length, bW = gap * 0.6; ctx.clearRect(0, 0, W, H);
+      datos.forEach(function (d, i) { var x = pL + i * gap + (gap - bW) / 2, bH = (d.v / mx) * (H - pT - pB), y = H - pB - bH; ctx.fillStyle = d.color + '33'; ctx.fillRect(x, pT, bW, H - pT - pB); ctx.fillStyle = d.color; ctx.fillRect(x, y, bW, bH); ctx.fillStyle = 'white'; ctx.font = 'bold 11px Nunito'; ctx.textAlign = 'center'; ctx.fillText(d.v, x + bW / 2, y - 6); var lb = d.label.length > 9 ? d.label.slice(0, 8) + '.' : d.label; ctx.fillStyle = 'rgba(148,163,184,.8)'; ctx.font = '9px Nunito'; ctx.fillText(lb, x + bW / 2, H - 8); });
     }
-
-    // ════════════════════════════════════════════════
-    // RANKING — datos de /api/ranking?mi_posicion=1
-    // ════════════════════════════════════════════════
     function renderRanking() {
-      var r = STATE.ranking;
-      var p = STATE.perfil;
-
-      document.getElementById('rankGlobal').textContent = '#' + (r.posicion_global || '—');
-      document.getElementById('rankGrado').textContent = '#' + (r.posicion_grado || '—');
-      document.getElementById('rankGradoSub').textContent = 'Grado ' + (r.grado_actual || '—');
-      document.getElementById('rankRango').textContent = p.sub_rango || '—';
-      document.getElementById('rankRangoSub').textContent = p.rango_completo || '';
+      var r = STATE.ranking, p = STATE.perfil;
+      document.getElementById('rankGlobal').textContent = '#' + (r.posicion_global || '—'); document.getElementById('rankGrado').textContent = '#' + (r.posicion_grado || '—'); document.getElementById('rankGradoSub').textContent = 'Grado ' + (r.grado_actual || '—'); document.getElementById('rankRango').textContent = p.sub_rango || '—'; document.getElementById('rankRangoSub').textContent = p.rango_completo || '';
     }
-
-    // ════════════════════════════════════════════════
-    // ASIGNATURAS — promedio de notas desde /api/evaluaciones
-    // Respuesta: { evaluaciones: [...], estadisticas: {...} }
-    // ════════════════════════════════════════════════
     function renderAsignaturas() {
-      var lista = document.getElementById('asigLista');
-      var evals = STATE.evals.evaluaciones || [];
-
-      // Solo las que tienen nota ingresada
-      var conNota = evals.filter(function (e) { return e.nota_obtenida != null; });
-
-      if (conNota.length === 0) {
-        lista.innerHTML = '<div class="empty-state"><span class="empty-icon">📚</span><p>Aún no tienes evaluaciones con nota ingresada.</p></div>';
-        return;
-      }
-
-      // Promediar por asignatura
-      var mapa = {};
-      conNota.forEach(function (e) {
-        if (!mapa[e.asignatura]) mapa[e.asignatura] = { suma: 0, count: 0 };
-        mapa[e.asignatura].suma += parseFloat(e.nota_obtenida);
-        mapa[e.asignatura].count += 1;
-      });
-
-      var asigs = Object.entries(mapa).map(function (entry) {
-        var meta = ASIG_META[entry[0]] || { emoji: '📘', color: '#7c3aed' };
-        var prom = entry[1].suma / entry[1].count;
-        return { nombre: entry[0], emoji: meta.emoji, color: meta.color, prom: prom, count: entry[1].count };
-      }).sort(function (a, b) { return b.prom - a.prom; });
-
-      lista.innerHTML = asigs.map(function (a) {
-        var pct = Math.round((a.prom / 7) * 100);
-        var notaStr = a.prom.toFixed(1);
-        var notaColor = a.prom >= 5.5 ? '#22c55e' : a.prom >= 4.0 ? '#f97316' : '#ef4444';
-        return '<div class="asig-item">' +
-          '<div class="asig-header">' +
-          '<span class="asig-nombre">' + a.emoji + ' ' + a.nombre + '</span>' +
-          '<div style="display:flex;align-items:center;gap:.5rem">' +
-          '<span class="asig-meta">' + a.count + ' eval.</span>' +
-          '<span class="asig-nota" style="background:' + notaColor + '22;color:' + notaColor + '">' + notaStr + '</span>' +
-          '</div>' +
-          '</div>' +
-          '<div class="asig-track"><div class="asig-fill" style="width:0%;background:' + a.color + '" data-w="' + pct + '%"></div></div>' +
-          '</div>';
-      }).join('');
-
-      setTimeout(function () {
-        document.querySelectorAll('.asig-fill').forEach(function (el) {
-          el.style.width = el.getAttribute('data-w');
+      var lista = document.getElementById('asigLista'), ev = STATE.evals.evaluaciones || [], cn = ev.filter(function (e) { return e.nota_obtenida != null; });
+      if (cn.length === 0) { lista.innerHTML = '<div class="empty-state"><span class="empty-icon">📚</span><p>Aún no tienes evaluaciones con nota ingresada.</p></div>'; return; }
+      var mp = {}; cn.forEach(function (e) { if (!mp[e.asignatura]) mp[e.asignatura] = { suma: 0, count: 0 }; mp[e.asignatura].suma += parseFloat(e.nota_obtenida); mp[e.asignatura].count += 1; });
+      var as = Object.entries(mp).map(function (en) { var m = ASIG_META[en[0]] || { emoji: '📘', color: '#7c3aed' }, pr = en[1].suma / en[1].count; return { nombre: en[0], emoji: m.emoji, color: m.color, prom: pr, count: en[1].count }; }).sort(function (a, b) { return b.prom - a.prom; });
+      lista.innerHTML = as.map(function (a) { var pct = Math.round((a.prom / 7) * 100), ns = a.prom.toFixed(1), nc = a.prom >= 5.5 ? '#22c55e' : a.prom >= 4.0 ? '#f97316' : '#ef4444'; return '<div class="asig-item"><div class="asig-header"><span class="asig-nombre">' + a.emoji + ' ' + a.nombre + '</span><div style="display:flex;align-items:center;gap:.5rem"><span class="asig-meta">' + a.count + ' eval.</span><span class="asig-nota" style="background:' + nc + '22;color:' + nc + '">' + ns + '</span></div></div><div class="asig-track"><div class="asig-fill" style="width:0%;background:' + a.color + '" data-w="' + pct + '%"></div></div></div>'; }).join('');
+      setTimeout(function () { document.querySelectorAll('.asig-fill').forEach(function (el) { el.style.width = el.getAttribute('data-w'); }); }, 200);
+    }
+    function renderEvalIa() {
+      var cont = document.getElementById('evalIaContenido');
+      var grupos = (STATE.evalIa && STATE.evalIa.grupos) ? STATE.evalIa.grupos : [];
+      if (grupos.length === 0) { cont.innerHTML = '<div class="empty-state" style="background:var(--card);border:1px solid var(--border);border-radius:var(--radius);padding:2rem;"><span class="empty-icon">📋</span><p>Aún no has realizado evaluaciones IA.</p></div>'; return; }
+      var html = '';
+      grupos.forEach(function (g, gi) {
+        var am = ASIG_META[g.asignatura] || { emoji: '📘' };
+        var us = g.unidades ? 'Unidad ' + g.unidades.join(', ') : '';
+        var ti = g.intentos.length;
+        var sn = g.intentos.reduce(function (a, i) { return a + i.nota; }, 0);
+        var pr = ti > 0 ? (sn / ti).toFixed(1) : '—', prN = ti > 0 ? sn / ti : 0;
+        var pc = prN >= 5.5 ? '#22c55e' : prN >= 4.0 ? '#f97316' : '#ef4444';
+        html += '<div class="eval-grupo">';
+        html += '<div class="eval-grupo-header" onclick="toggleEvalGrupo(' + gi + ')" id="eval-header-' + gi + '">';
+        html += '<div class="eval-grupo-titulo">' + am.emoji + ' ' + g.nombre + (us ? ' <span style="font-size:.7rem;color:var(--text-dim);font-weight:700;">· ' + us + '</span>' : '') + '</div>';
+        html += '<div class="eval-grupo-meta"><span class="eval-badge-asig">' + g.asignatura + '</span><span class="eval-badge-intentos">' + ti + ' intento' + (ti !== 1 ? 's' : '') + '</span><span style="font-size:.75rem;font-weight:900;color:' + pc + ';">Prom: ' + pr + '</span><span class="eval-toggle" id="eval-toggle-' + gi + '">▼</span></div>';
+        html += '</div>';
+        html += '<div id="eval-tabla-' + gi + '" style="display:none;"><div class="eval-tabla-wrap"><table class="eval-tabla">';
+        html += '<thead><tr><th>N°</th><th>Fecha</th><th>Correctas</th><th>Incorrectas</th><th>Total</th><th>%</th><th>Nota</th></tr></thead><tbody>';
+        g.intentos.forEach(function (it) {
+          var f = new Date(it.fecha).toLocaleDateString('es-CL', { day: '2-digit', month: '2-digit', year: 'numeric' });
+          var nc = it.nota >= 5.5 ? 'aprobado' : it.nota >= 4.0 ? 'regular' : 'reprobado';
+          var ns = String(it.nota).replace('.', ',');
+          html += '<tr><td style="color:var(--text-muted);">' + it.numero + '</td><td>' + f + '</td><td style="color:#22c55e;font-weight:900;">' + it.buenas + '</td><td style="color:#ef4444;font-weight:900;">' + it.malas + '</td><td style="color:var(--text-dim);">' + it.total_preguntas + '</td><td style="color:var(--text-dim);">' + it.precision_pct + '%</td><td><span class="nota-pill ' + nc + '">' + ns + '</span></td></tr>';
         });
-      }, 200);
+        html += '</tbody></table></div></div></div>';
+      });
+      cont.innerHTML = html;
+      if (grupos.length > 0) toggleEvalGrupo(0);
     }
-
-    // ════════════════════════════════════════════════
-    // MISIONES — datos de /api/misiones
-    // Respuesta: { misiones: [...], semanales: [...], ... }
-    // ════════════════════════════════════════════════
+    window.toggleEvalGrupo = function (idx) {
+      var t = document.getElementById('eval-tabla-' + idx), tg = document.getElementById('eval-toggle-' + idx);
+      if (!t) return; var ab = t.style.display !== 'none'; t.style.display = ab ? 'none' : 'block'; if (tg) tg.textContent = ab ? '▼' : '▲';
+    };
     function renderMisiones() {
-      var misiones = STATE.misiones.misiones || [];
-      var semanales = STATE.misiones.semanales || [];
-      var completadas = misiones.filter(function (m) { return m.completada; }).length;
-      var total = misiones.length;
-      var semComp = semanales.filter(function (m) { return m.completada; }).length;
-      var semTotal = semanales.length;
-
-      // Monedas y XP ganadas en misiones completadas hoy
-      var monMisiones = misiones
-        .filter(function (m) { return m.completada; })
-        .reduce(function (acc, m) { return acc + (Number(m.recompensa_monedas) || 0); }, 0);
-      var xpMisiones = misiones
-        .filter(function (m) { return m.completada; })
-        .reduce(function (acc, m) { return acc + (Number(m.recompensa_xp) || 0); }, 0);
-
-      document.getElementById('misionesStats').innerHTML =
-        statBox(completadas + '/' + total, 'Diarias hoy', 'var(--yellow)') +
-        statBox(semComp + '/' + semTotal, 'Semanales', 'var(--cyan)') +
-        statBox('+' + monMisiones + ' 🪙', 'Monedas por misiones', 'var(--green)') +
-        statBox('+' + xpMisiones + ' XP', 'XP por misiones', 'var(--violet)');
+      var ms = STATE.misiones.misiones || [], sw = STATE.misiones.semanales || [];
+      var co = ms.filter(function (m) { return m.completada; }).length, to = ms.length, sc = sw.filter(function (m) { return m.completada; }).length, st = sw.length;
+      var mm = ms.filter(function (m) { return m.completada; }).reduce(function (a, m) { return a + (Number(m.recompensa_monedas) || 0); }, 0);
+      var xm = ms.filter(function (m) { return m.completada; }).reduce(function (a, m) { return a + (Number(m.recompensa_xp) || 0); }, 0);
+      document.getElementById('misionesStats').innerHTML = statBox(co + '/' + to, 'Diarias hoy', 'var(--yellow)') + statBox(sc + '/' + st, 'Semanales', 'var(--cyan)') + statBox('+' + mm + ' 🪙', 'Monedas por misiones', 'var(--green)') + statBox('+' + xm + ' XP', 'XP por misiones', 'var(--violet)');
     }
-
-    // ════════════════════════════════════════════════
-    // ACTIVIDAD DE JUEGOS HOY — datos de /api/juegos
-    // ════════════════════════════════════════════════
     function renderJuegoStats() {
-      var partidas = STATE.juegos.partidas_hoy || [];
-      var niveles = STATE.juegos.niveles_por_juego || {};
-
-      var totalPartidas = partidas.length;
-      var totalMonedas = partidas.reduce(function (a, p) { return a + (Number(p.monedas_ganadas) || 0); }, 0);
-      var totalXP = partidas.reduce(function (a, p) { return a + (Number(p.xp_ganado) || 0); }, 0);
-      var juegosDist = Object.keys(
-        partidas.reduce(function (acc, p) { if (p.juego_id) acc[p.juego_id] = 1; return acc; }, {})
-      ).length;
-
-      document.getElementById('juegoStats').innerHTML =
-        statBox(totalPartidas, 'Partidas jugadas', 'var(--cyan)') +
-        statBox(juegosDist, 'Juegos distintos', 'var(--green)') +
-        statBox('+' + totalMonedas + ' 🪙', 'Monedas ganadas', 'var(--yellow)') +
-        statBox('+' + totalXP + ' XP', 'XP ganado', 'var(--violet)');
+      var p = STATE.juegos.partidas_hoy || [];
+      var tp = p.length, tm = p.reduce(function (a, x) { return a + (Number(x.monedas_ganadas) || 0); }, 0), tx = p.reduce(function (a, x) { return a + (Number(x.xp_ganado) || 0); }, 0);
+      var jd = Object.keys(p.reduce(function (acc, x) { if (x.juego_id) acc[x.juego_id] = 1; return acc; }, {})).length;
+      document.getElementById('juegoStats').innerHTML = statBox(tp, 'Partidas jugadas', 'var(--cyan)') + statBox(jd, 'Juegos distintos', 'var(--green)') + statBox('+' + tm + ' 🪙', 'Monedas ganadas', 'var(--yellow)') + statBox('+' + tx + ' XP', 'XP ganado', 'var(--violet)');
     }
-
-    // Helper: caja de stat
-    function statBox(num, label, color) {
-      return '<div class="stat-box">' +
-        '<span class="stat-num" style="color:' + color + '">' + num + '</span>' +
-        '<span class="stat-label">' + label + '</span>' +
-        '</div>';
-    }
-
-    window.addEventListener('resize', function () {
-      if (STATE.juegos) { renderGraficoMonedas(); renderGraficoJuegos(); }
-    });
+    function statBox(n, l, c) { return '<div class="stat-box"><span class="stat-num" style="color:' + c + '">' + n + '</span><span class="stat-label">' + l + '</span></div>'; }
+    window.addEventListener('resize', function () { if (STATE.juegos) { renderGraficoMonedas(); renderGraficoJuegos(); } });
   </script>
 </body>
 

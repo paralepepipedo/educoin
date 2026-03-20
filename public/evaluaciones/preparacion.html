@@ -1,0 +1,1620 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Evaluación — EduCoins</title>
+
+  <script data-clerk-publishable-key="pk_test_bG92aW5nLXJhcHRvci0xLmNsZXJrLmFjY291bnRzLmRldiQ"
+    src="https://lovable-raptor-1.clerk.accounts.dev/npm/@clerk/clerk-js@latest/dist/clerk.browser.js"
+    crossorigin="anonymous"></script>
+
+  <style>
+    *,
+    *::before,
+    *::after {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      font-family: Arial, sans-serif;
+      background: #1a3a1a;
+      min-height: 100vh;
+      overflow-x: hidden;
+    }
+
+    body::before {
+      content: '';
+      position: fixed;
+      inset: 0;
+      z-index: 0;
+      background: repeating-linear-gradient(transparent, transparent 31px, rgba(255, 255, 255, 0.03) 31px, rgba(255, 255, 255, 0.03) 32px);
+      pointer-events: none;
+    }
+
+    /* HEADER FLOTANTE */
+    #headerFlotante {
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      z-index: 200;
+      background: rgba(15, 35, 15, 0.97);
+      backdrop-filter: blur(6px);
+      border-bottom: 1px solid rgba(255, 255, 255, 0.07);
+      padding: 10px 16px;
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+
+    #btnVolver {
+      background: transparent;
+      border: 1px solid rgba(255, 255, 255, 0.2);
+      color: rgba(255, 255, 255, 0.55);
+      font-family: Arial;
+      font-size: 11px;
+      padding: 5px 12px;
+      border-radius: 2px;
+      cursor: pointer;
+      white-space: nowrap;
+      flex-shrink: 0;
+      transition: all .2s;
+    }
+
+    #btnVolver:hover {
+      color: rgba(255, 255, 255, 0.85);
+      border-color: rgba(255, 255, 255, 0.4);
+    }
+
+    #headerInfo {
+      flex: 1;
+      min-width: 0;
+    }
+
+    #headerTitulo {
+      color: #c8e6a8;
+      font-size: 12px;
+      font-weight: bold;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    #headerSub {
+      color: rgba(255, 255, 255, 0.35);
+      font-size: 10px;
+      margin-top: 1px;
+    }
+
+    #dotsContainer {
+      display: flex;
+      gap: 5px;
+      flex-wrap: wrap;
+      max-width: 300px;
+      justify-content: flex-end;
+    }
+
+    .dot-prog {
+      width: 24px;
+      height: 24px;
+      border-radius: 50%;
+      border: 1.5px solid rgba(255, 255, 255, 0.18);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 9px;
+      font-weight: bold;
+      color: rgba(255, 255, 255, 0.3);
+      transition: all .3s;
+      flex-shrink: 0;
+    }
+
+    .dot-prog.respondido {
+      background: rgba(160, 210, 100, 0.2);
+      border-color: rgba(160, 210, 100, 0.6);
+      color: rgba(190, 240, 130, 0.9);
+    }
+
+    /* Temporizador */
+    #timerDisplay {
+      font-family: 'Courier New', monospace;
+      font-size: 13px;
+      font-weight: bold;
+      color: #e8d080;
+      background: rgba(232, 208, 128, 0.1);
+      border: 1px solid rgba(232, 208, 128, 0.3);
+      padding: 4px 10px;
+      border-radius: 2px;
+      white-space: nowrap;
+      flex-shrink: 0;
+    }
+
+    #timerDisplay.urgente {
+      color: #e07070;
+      background: rgba(220, 100, 100, 0.1);
+      border-color: rgba(220, 100, 100, 0.4);
+    }
+
+    #btnEntregar {
+      background: transparent;
+      border: 1.5px solid rgba(180, 100, 100, 0.55);
+      color: rgba(220, 160, 160, 0.85);
+      font-family: Arial;
+      font-size: 11px;
+      font-weight: bold;
+      padding: 6px 14px;
+      border-radius: 2px;
+      cursor: pointer;
+      white-space: nowrap;
+      flex-shrink: 0;
+      transition: all .2s;
+      display: none;
+    }
+
+    #btnEntregar:hover {
+      background: rgba(180, 50, 50, 0.2);
+      border-color: rgba(220, 100, 100, 0.8);
+    }
+
+    /* LOADING */
+    #screenLoading {
+      position: fixed;
+      inset: 0;
+      z-index: 100;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      gap: 1rem;
+      background: #1a3a1a;
+    }
+
+    .spinner {
+      width: 36px;
+      height: 36px;
+      border: 3px solid rgba(255, 255, 255, 0.1);
+      border-top-color: rgba(180, 220, 120, 0.7);
+      border-radius: 50%;
+      animation: spin .8s linear infinite;
+    }
+
+    @keyframes spin {
+      to {
+        transform: rotate(360deg);
+      }
+    }
+
+    #screenLoading p {
+      color: rgba(255, 255, 255, 0.4);
+      font-size: 13px;
+    }
+
+    /* PREP */
+    #screenPrep {
+      position: fixed;
+      inset: 0;
+      z-index: 99;
+      background: #1a3a1a;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 1rem;
+    }
+
+    .prep-hoja {
+      background: #fdfaf3;
+      max-width: 500px;
+      width: 100%;
+      padding: 2.5rem 2rem;
+      box-shadow: 4px 6px 0 rgba(0, 0, 0, 0.5), 0 0 0 1px rgba(0, 0, 0, 0.15);
+      border-radius: 1px;
+      text-align: center;
+    }
+
+    .prep-hoja h1 {
+      font-size: 18px;
+      color: #111;
+      margin-bottom: 6px;
+      font-weight: bold;
+    }
+
+    .prep-hoja .asig-tag {
+      font-size: 12px;
+      color: #666;
+      margin-bottom: 1.5rem;
+    }
+
+    .prep-stats {
+      display: flex;
+      justify-content: center;
+      gap: 2rem;
+      margin-bottom: 1.5rem;
+    }
+
+    .prep-stat-val {
+      font-size: 26px;
+      font-weight: bold;
+      color: #1a1a1a;
+      display: block;
+    }
+
+    .prep-stat-lbl {
+      font-size: 10px;
+      color: #999;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+    }
+
+    .prep-repaso {
+      background: #fff8e8;
+      border: 1px solid #e8d080;
+      border-radius: 2px;
+      padding: 8px 12px;
+      font-size: 12px;
+      color: #886600;
+      margin-bottom: 1.5rem;
+      display: none;
+    }
+
+    .btn-comenzar {
+      width: 100%;
+      padding: 12px;
+      background: #1a3a1a;
+      color: #fdfaf3;
+      border: none;
+      border-radius: 2px;
+      font-family: Arial;
+      font-size: 14px;
+      font-weight: bold;
+      cursor: pointer;
+      letter-spacing: 0.05em;
+      transition: background .2s;
+    }
+
+    .btn-comenzar:hover {
+      background: #2a5a2a;
+    }
+
+    .btn-comenzar:disabled {
+      opacity: .5;
+      cursor: not-allowed;
+    }
+
+    /* HOJA */
+    #screenPrueba {
+      padding-top: 60px;
+      padding-bottom: 4rem;
+      display: flex;
+      justify-content: center;
+      position: relative;
+      z-index: 1;
+    }
+
+    .hoja-oficio {
+      background: #ffffff;
+      width: 100%;
+      max-width: 620px;
+      margin: 1.5rem 1rem;
+      box-shadow: 5px 8px 0 rgba(0, 0, 0, 0.55), 0 0 0 1px rgba(0, 0, 0, 0.12);
+      border-radius: 1px;
+      position: relative;
+    }
+
+    .hoja-header {
+      padding: 2rem 2.5rem 1.2rem;
+      border-bottom: 2.5px solid #111;
+    }
+
+    .hoja-colegio {
+      font-size: 10px;
+      text-transform: uppercase;
+      letter-spacing: 0.12em;
+      color: #888;
+      margin-bottom: 8px;
+    }
+
+    .hoja-titulo {
+      font-size: 20px;
+      font-weight: bold;
+      color: #111;
+      margin-bottom: 10px;
+    }
+
+    .hoja-meta {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 1.5rem;
+      font-size: 11px;
+      color: #444;
+    }
+
+    .hoja-meta-item {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    #listaPreguntasHoja {
+      padding: 0 2.5rem;
+    }
+
+    .bloque-q {
+      padding: 1.6rem 0;
+      border-bottom: 1px solid #e0e0e0;
+      transition: transform .45s cubic-bezier(.25, .46, .45, .94), opacity .45s;
+      transform-origin: left center;
+    }
+
+    .bloque-q:last-child {
+      border-bottom: none;
+    }
+
+    .bloque-q.enfocado {
+      transform: scale(1.012);
+      opacity: 1;
+    }
+
+    .bloque-q.adyacente {
+      transform: scale(1);
+      opacity: 0.88;
+    }
+
+    .bloque-q.lejano {
+      transform: scale(0.988);
+      opacity: 0.6;
+    }
+
+    .bq-tipo {
+      font-size: 10px;
+      color: #bbb;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      margin-bottom: 6px;
+    }
+
+    .bq-enunciado {
+      font-size: 14px;
+      color: #111;
+      line-height: 1.7;
+      margin-bottom: 1rem;
+      font-weight: bold;
+    }
+
+    .opciones-lista {
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+    }
+
+    .opciones-lista.vf {
+      flex-direction: row;
+      gap: 1.5rem;
+    }
+
+    .op-item {
+      display: flex;
+      align-items: flex-start;
+      gap: 10px;
+      padding: 7px 10px;
+      border: 1px solid #ddd;
+      border-radius: 2px;
+      cursor: pointer;
+      background: #fff;
+      transition: all .18s;
+      -webkit-tap-highlight-color: transparent;
+    }
+
+    .op-item:hover {
+      border-color: #aaa;
+      background: #f8f8f8;
+    }
+
+    .op-item.marcada {
+      border-color: #2a6a2a;
+      border-width: 1.5px;
+      background: #f2f9f2;
+    }
+
+    .op-circulo {
+      width: 18px;
+      height: 18px;
+      border-radius: 50%;
+      border: 1.5px solid #bbb;
+      flex-shrink: 0;
+      margin-top: 1px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: all .18s;
+    }
+
+    .op-item.marcada .op-circulo {
+      background: #2a6a2a;
+      border-color: #2a6a2a;
+    }
+
+    .op-check {
+      display: none;
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+      background: white;
+    }
+
+    .op-item.marcada .op-check {
+      display: block;
+    }
+
+    .op-texto {
+      font-size: 13px;
+      color: #222;
+      line-height: 1.45;
+    }
+
+    .op-item.marcada .op-texto {
+      color: #1a4a1a;
+      font-weight: bold;
+    }
+
+    /* Revisión múltiple/VF */
+    .op-item.revision-correcta {
+      border-color: #2a6a2a;
+      border-width: 1.5px;
+      background: #f0faf0;
+    }
+
+    .op-item.revision-incorrecta {
+      border-color: #cc3333;
+      border-width: 1.5px;
+      background: #fff5f5;
+    }
+
+    .op-item.revision-correcta .op-texto {
+      color: #1a4a1a;
+      font-weight: bold;
+    }
+
+    .op-item.revision-incorrecta .op-texto {
+      color: #882222;
+      font-weight: bold;
+    }
+
+    .op-item.revision-correcta .op-circulo {
+      background: #2a6a2a;
+      border-color: #2a6a2a;
+    }
+
+    .op-item.revision-correcta .op-check {
+      display: block;
+    }
+
+    .op-item.revision-incorrecta .op-circulo {
+      background: #cc3333;
+      border-color: #cc3333;
+    }
+
+    .op-item.revision-incorrecta .op-check {
+      display: block;
+    }
+
+    .revision-sin-responder {
+      font-size: 11px;
+      color: #888;
+      font-style: italic;
+      margin-top: 6px;
+      padding-left: 4px;
+    }
+
+    /* Unir conceptos */
+    .unir-instruccion {
+      font-size: 11px;
+      color: #888;
+      margin-bottom: 10px;
+      font-style: italic;
+    }
+
+    .unir-grilla {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 1.5rem;
+      position: relative;
+    }
+
+    .unir-col-titulo {
+      font-size: 10px;
+      color: #aaa;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      margin-bottom: 6px;
+    }
+
+    .unir-btn {
+      display: block;
+      width: 100%;
+      padding: 8px 10px;
+      margin-bottom: 6px;
+      border: 1px solid #ddd;
+      border-radius: 2px;
+      background: #fff;
+      color: #222;
+      font-family: Arial;
+      font-size: 12.5px;
+      text-align: center;
+      cursor: pointer;
+      transition: all .2s;
+      -webkit-tap-highlight-color: transparent;
+    }
+
+    .unir-btn:hover:not(.emparejado) {
+      border-color: #aaa;
+      background: #f8f8f8;
+    }
+
+    .unir-btn.seleccionado {
+      border: 1.5px solid #2255bb;
+      background: rgba(220, 232, 255, 0.6);
+      color: #1a3a8a;
+    }
+
+    .unir-btn.par-error {
+      border-color: #cc4444;
+      background: rgba(255, 220, 220, 0.5);
+    }
+
+    .unir-btn.emparejado {
+      cursor: default;
+    }
+
+    .unir-svg {
+      position: absolute;
+      inset: 0;
+      pointer-events: none;
+      overflow: visible;
+      width: 100%;
+      height: 100%;
+    }
+
+    .unir-revision-msg {
+      font-size: 11px;
+      color: #cc3333;
+      font-weight: bold;
+      margin-top: 8px;
+    }
+
+    /* Pie hoja */
+    .hoja-pie {
+      padding: 1.5rem 2.5rem 2.5rem;
+      border-top: 2.5px solid #111;
+      display: flex;
+      justify-content: flex-end;
+      margin-top: 0.5rem;
+    }
+
+    .btn-entregar-pie {
+      background: #111;
+      color: #fff;
+      border: none;
+      border-radius: 1px;
+      font-family: Arial;
+      font-size: 13px;
+      font-weight: bold;
+      padding: 11px 28px;
+      cursor: pointer;
+      letter-spacing: 0.05em;
+      transition: background .2s;
+    }
+
+    .btn-entregar-pie:hover {
+      background: #2a2a2a;
+    }
+
+    .btn-entregar-pie:disabled {
+      opacity: .5;
+      cursor: not-allowed;
+    }
+
+    /* MODAL RESULTADO */
+    #screenFinal {
+      position: fixed;
+      inset: 0;
+      z-index: 300;
+      background: rgba(10, 25, 10, 0.92);
+      display: none;
+      align-items: center;
+      justify-content: center;
+      padding: 1rem;
+      animation: fadeIn .3s ease;
+    }
+
+    #screenFinal.active {
+      display: flex;
+    }
+
+    @keyframes fadeIn {
+      from {
+        opacity: 0;
+      }
+
+      to {
+        opacity: 1;
+      }
+    }
+
+    .modal-resultado {
+      background: #fdfaf3;
+      max-width: 500px;
+      width: 100%;
+      border-radius: 1px;
+      box-shadow: 5px 8px 0 rgba(0, 0, 0, 0.6), 0 0 0 1px rgba(0, 0, 0, 0.2);
+      overflow: hidden;
+      animation: slideUp .35s cubic-bezier(.25, .46, .45, .94);
+    }
+
+    @keyframes slideUp {
+      from {
+        transform: translateY(30px);
+        opacity: 0;
+      }
+
+      to {
+        transform: translateY(0);
+        opacity: 1;
+      }
+    }
+
+    .modal-header {
+      background: #111;
+      padding: 1.5rem 2rem;
+      text-align: center;
+    }
+
+    .modal-header h2 {
+      font-size: 14px;
+      color: rgba(255, 255, 255, 0.6);
+      font-weight: normal;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      margin-bottom: 8px;
+    }
+
+    .nota-display {
+      font-size: 72px;
+      font-weight: bold;
+      font-family: Arial;
+      line-height: 1;
+      margin: 0.3rem 0;
+    }
+
+    .nota-display.aprobado {
+      color: #a0d870;
+    }
+
+    .nota-display.reprobado {
+      color: #e07070;
+    }
+
+    .badge-estado {
+      display: inline-block;
+      font-size: 11px;
+      font-weight: bold;
+      padding: 4px 16px;
+      border-radius: 1px;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      margin-bottom: 0.3rem;
+    }
+
+    .badge-estado.aprobado {
+      background: rgba(160, 216, 112, 0.2);
+      color: #a0d870;
+      border: 1px solid rgba(160, 216, 112, 0.4);
+    }
+
+    .badge-estado.reprobado {
+      background: rgba(220, 100, 100, 0.2);
+      color: #e07070;
+      border: 1px solid rgba(220, 100, 100, 0.4);
+    }
+
+    .modal-body {
+      padding: 1.5rem 2rem;
+    }
+
+    .chips-resultado {
+      display: flex;
+      gap: 0.8rem;
+      margin-bottom: 1.2rem;
+    }
+
+    .chip-r {
+      flex: 1;
+      text-align: center;
+      border: 1px solid #e0e0e0;
+      border-radius: 2px;
+      padding: 10px 8px;
+      background: #fff;
+    }
+
+    .chip-r-val {
+      font-size: 22px;
+      font-weight: bold;
+      color: #111;
+      display: block;
+    }
+
+    .chip-r-lbl {
+      font-size: 10px;
+      color: #999;
+      text-transform: uppercase;
+      letter-spacing: 0.06em;
+    }
+
+    .chip-r.verde {
+      border-color: #aad890;
+    }
+
+    .chip-r.verde .chip-r-val {
+      color: #2a6a2a;
+    }
+
+    .chip-r.rojo {
+      border-color: #e8b0b0;
+    }
+
+    .chip-r.rojo .chip-r-val {
+      color: #aa3030;
+    }
+
+    .recompensas-row {
+      display: flex;
+      gap: 0.8rem;
+      margin-bottom: 1.2rem;
+    }
+
+    .recomp-chip {
+      flex: 1;
+      text-align: center;
+      padding: 8px;
+      border-radius: 2px;
+      font-size: 14px;
+      font-weight: bold;
+    }
+
+    .recomp-chip.monedas {
+      background: #fff8e8;
+      color: #886600;
+      border: 1px solid #e8d080;
+    }
+
+    .recomp-chip.xp {
+      background: #eef0ff;
+      color: #4444aa;
+      border: 1px solid #c0c8f0;
+    }
+
+    .repaso-aviso {
+      background: #f8f8f8;
+      border: 1px solid #e0e0e0;
+      border-radius: 2px;
+      padding: 10px 14px;
+      font-size: 12px;
+      color: #666;
+      line-height: 1.6;
+      margin-bottom: 1.2rem;
+      display: none;
+    }
+
+    .modal-btns {
+      display: flex;
+      gap: 8px;
+    }
+
+    .modal-btns button {
+      flex: 1;
+      padding: 10px;
+      font-family: Arial;
+      font-size: 12px;
+      font-weight: bold;
+      border-radius: 2px;
+      cursor: pointer;
+      transition: all .2s;
+    }
+
+    .btn-revisar {
+      background: #fff;
+      color: #111;
+      border: 1.5px solid #111;
+    }
+
+    .btn-revisar:hover {
+      background: #f0f0f0;
+    }
+
+    .btn-menu-final {
+      background: #111;
+      color: #fff;
+      border: none;
+    }
+
+    .btn-menu-final:hover {
+      background: #2a2a2a;
+    }
+
+    /* ERROR */
+    #screenError {
+      position: fixed;
+      inset: 0;
+      z-index: 200;
+      display: none;
+      align-items: center;
+      justify-content: center;
+      flex-direction: column;
+      gap: 1rem;
+      padding: 1rem;
+      text-align: center;
+      background: #1a3a1a;
+    }
+
+    #screenError.active {
+      display: flex;
+    }
+
+    #screenError h2 {
+      color: #e07070;
+      font-size: 16px;
+    }
+
+    #screenError p {
+      color: rgba(255, 255, 255, 0.5);
+      font-size: 13px;
+      max-width: 360px;
+    }
+
+    .btn-error-volver {
+      background: transparent;
+      border: 1px solid rgba(255, 255, 255, 0.3);
+      color: rgba(255, 255, 255, 0.6);
+      font-family: Arial;
+      font-size: 12px;
+      padding: 8px 20px;
+      border-radius: 2px;
+      cursor: pointer;
+      margin-top: 0.5rem;
+    }
+
+    /* MODAL CONFIRMAR */
+    #modalConfirmar {
+      position: fixed;
+      inset: 0;
+      z-index: 400;
+      background: rgba(10, 25, 10, 0.88);
+      display: none;
+      align-items: center;
+      justify-content: center;
+      padding: 1rem;
+    }
+
+    #modalConfirmar.active {
+      display: flex;
+    }
+
+    .confirm-box {
+      background: #fdfaf3;
+      max-width: 380px;
+      width: 100%;
+      border-radius: 1px;
+      box-shadow: 4px 6px 0 rgba(0, 0, 0, 0.55), 0 0 0 1px rgba(0, 0, 0, 0.15);
+      padding: 2rem;
+    }
+
+    .confirm-box h3 {
+      font-size: 15px;
+      color: #111;
+      margin-bottom: 8px;
+    }
+
+    .confirm-box p {
+      font-size: 13px;
+      color: #555;
+      line-height: 1.6;
+      margin-bottom: 1.5rem;
+    }
+
+    .confirm-btns {
+      display: flex;
+      gap: 8px;
+    }
+
+    .confirm-btns button {
+      flex: 1;
+      padding: 10px;
+      font-family: Arial;
+      font-size: 12px;
+      font-weight: bold;
+      border-radius: 2px;
+      cursor: pointer;
+    }
+
+    .btn-confirm-si {
+      background: #111;
+      color: #fff;
+      border: none;
+    }
+
+    .btn-confirm-no {
+      background: #fff;
+      color: #111;
+      border: 1.5px solid #aaa;
+    }
+
+    @media (max-width: 480px) {
+
+      .hoja-header,
+      #listaPreguntasHoja,
+      .hoja-pie {
+        padding-left: 1.2rem;
+        padding-right: 1.2rem;
+      }
+
+      .hoja-oficio {
+        margin: 1rem 0.5rem;
+      }
+
+      .nota-display {
+        font-size: 56px;
+      }
+
+      #dotsContainer {
+        max-width: 180px;
+      }
+    }
+  </style>
+</head>
+
+<body>
+
+  <div id="screenLoading">
+    <div class="spinner"></div>
+    <p>Cargando evaluación...</p>
+  </div>
+
+  <div id="screenError">
+    <h2>⚠ Error</h2>
+    <p id="errorMsg">No se pudo cargar la evaluación.</p>
+    <button class="btn-error-volver" onclick="volverAtras()">← Volver</button>
+  </div>
+
+  <div id="screenPrep">
+    <div class="prep-hoja">
+      <div style="font-size:10px;text-transform:uppercase;letter-spacing:0.12em;color:#888;margin-bottom:10px;">EduCoins
+        · Evaluación IA</div>
+      <h1 id="prepNombre">Cargando...</h1>
+      <div class="asig-tag" id="prepAsig">—</div>
+      <div class="prep-stats">
+        <div><span class="prep-stat-val" id="prepCant">—</span><span class="prep-stat-lbl">Preguntas</span></div>
+        <div><span class="prep-stat-val" id="prepMonedas">—</span><span class="prep-stat-lbl">🪙 Máx.</span></div>
+        <div><span class="prep-stat-val" id="prepXp">—</span><span class="prep-stat-lbl">⚡ XP</span></div>
+      </div>
+      <div class="prep-repaso" id="prepRepaso"></div>
+      <button class="btn-comenzar" id="btnComenzar">COMENZAR EVALUACIÓN</button>
+    </div>
+  </div>
+
+  <div id="headerFlotante" style="display:none;">
+    <button id="btnVolver" onclick="volverAtras()">← Volver</button>
+    <div id="headerInfo">
+      <div id="headerTitulo">—</div>
+      <div id="headerSub">—</div>
+    </div>
+    <div id="dotsContainer"></div>
+    <div id="timerDisplay" style="display:none;">45:00</div>
+    <button id="btnEntregar" onclick="confirmarEntrega()">Entregar prueba</button>
+  </div>
+
+  <div id="screenPrueba">
+    <div class="hoja-oficio" id="hojaOficio">
+      <div class="hoja-header">
+        <div class="hoja-colegio">EduCoins · Evaluación IA</div>
+        <div class="hoja-titulo" id="hojaTitulo">—</div>
+        <div class="hoja-meta">
+          <div class="hoja-meta-item">Asignatura: <strong id="hojaAsig">—</strong></div>
+          <div class="hoja-meta-item">Grado: <strong id="hojaGrado">—</strong></div>
+        </div>
+      </div>
+      <div id="listaPreguntasHoja"></div>
+      <div class="hoja-pie">
+        <button class="btn-entregar-pie" id="btnEntregarPie" onclick="confirmarEntrega()">Entregar Evaluación</button>
+      </div>
+    </div>
+  </div>
+
+  <div id="screenFinal">
+    <div class="modal-resultado">
+      <div class="modal-header">
+        <h2>Resultado Final</h2>
+        <div class="nota-display" id="notaDisplay">—</div>
+        <div class="badge-estado" id="badgeEstado">—</div>
+      </div>
+      <div class="modal-body">
+        <div class="chips-resultado">
+          <div class="chip-r verde"><span class="chip-r-val" id="chipBuenas">—</span><span
+              class="chip-r-lbl">Correctas</span></div>
+          <div class="chip-r rojo"><span class="chip-r-val" id="chipMalas">—</span><span
+              class="chip-r-lbl">Incorrectas</span></div>
+          <div class="chip-r"><span class="chip-r-val" id="chipTotal">—</span><span class="chip-r-lbl">Total</span>
+          </div>
+        </div>
+        <div class="recompensas-row">
+          <div class="recomp-chip monedas">🪙 +<span id="finalMonedas">0</span> Monedas</div>
+          <div class="recomp-chip xp">⚡ +<span id="finalXp">0</span> XP</div>
+        </div>
+        <div class="repaso-aviso" id="repasoAviso"></div>
+        <div class="modal-btns">
+          <button class="btn-revisar" onclick="cerrarModalYRevisar()">Revisar prueba</button>
+          <button class="btn-menu-final" onclick="volverAtras()">Volver al menú</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div id="modalConfirmar">
+    <div class="confirm-box">
+      <h3>¿Entregar evaluación?</h3>
+      <p id="confirmMsg">¿Estás seguro de que deseas entregar?</p>
+      <div class="confirm-btns">
+        <button class="btn-confirm-no"
+          onclick="document.getElementById('modalConfirmar').classList.remove('active')">Cancelar</button>
+        <button class="btn-confirm-si" id="btnConfirmSi">Entregar</button>
+      </div>
+    </div>
+  </div>
+
+  <script src="../auth/clerk-config.js"></script>
+  <script src="../shared/clerk-guard.js"></script>
+
+  <script>
+    // VERSIÓN: v2.0.0
+    const BASE_URL = (window.location.hostname === 'localhost'
+      || window.location.hostname === '127.0.0.1'
+      || window.location.hostname === 'emby.ddns.net')
+      ? (window.location.hostname === 'emby.ddns.net' ? 'http://emby.ddns.net:3000' : 'http://localhost:3000')
+      : 'https://educoin-lilac.vercel.app';
+
+    (function () {
+      'use strict';
+
+      const COLORES_PARES = [
+        { bg: 'rgba(220,232,255,0.7)', border: '#2255bb', text: '#1a3a8a' },
+        { bg: 'rgba(220,255,225,0.7)', border: '#2a7a2a', text: '#1a4a1a' },
+        { bg: 'rgba(255,235,210,0.7)', border: '#b06010', text: '#7a3a00' },
+        { bg: 'rgba(245,220,255,0.7)', border: '#7a2aaa', text: '#4a1a7a' },
+        { bg: 'rgba(255,220,230,0.7)', border: '#aa2244', text: '#7a1a30' },
+      ];
+
+      let pruebaId = null;
+      let pruebaMeta = null;
+      let preguntas = [];
+      let mapaRespuestas = {};
+      let respuestasAlumno = {};
+      let enfocadoIdx = 0;
+      let entregada = false;
+      let unirSelIzq = {};
+      let timerInterval = null;
+      let segundosRestantes = 45 * 60;
+
+      const params = new URLSearchParams(window.location.search);
+      pruebaId = params.get('id');
+
+      window.volverAtras = function () {
+        const ref = document.referrer;
+        if (ref && ref !== window.location.href) window.location.href = ref;
+        else window.location.href = '/dashboard/dashboard.html';
+      };
+
+      function mostrarLoading(msg) {
+        document.getElementById('screenLoading').style.display = 'flex';
+        document.querySelector('#screenLoading p').textContent = msg || 'Cargando...';
+      }
+      function ocultarLoading() { document.getElementById('screenLoading').style.display = 'none'; }
+      function mostrarError(msg) {
+        ocultarLoading();
+        document.getElementById('errorMsg').textContent = msg;
+        document.getElementById('screenError').classList.add('active');
+      }
+
+      async function apiPost(body) {
+        let token = window.CLERK_TOKEN;
+        if (window.Clerk && window.Clerk.session) token = await window.Clerk.session.getToken();
+        const r = await fetch(BASE_URL + '/api/pruebas', {
+          method: 'POST',
+          headers: { 'Authorization': 'Bearer ' + token, 'Content-Type': 'application/json' },
+          body: JSON.stringify(body)
+        });
+        const data = await r.json();
+        if (data.error) throw new Error(data.mensaje || 'Error del servidor');
+        return data;
+      }
+
+      // ── INICIO ─────────────────────────────────────
+      document.addEventListener('clerkReady', async function () {
+        if (!pruebaId) return mostrarError('No se especificó una prueba. Verifica el link.');
+        try {
+          const res = await apiPost({ action: 'get_prueba', id: pruebaId });
+          pruebaMeta = res.prueba;
+          document.getElementById('prepNombre').textContent = pruebaMeta.nombre;
+          document.getElementById('prepAsig').textContent = pruebaMeta.asignatura + ' · ' + pruebaMeta.grado + '° Básico';
+          document.getElementById('prepCant').textContent = pruebaMeta.preguntas_por_intento;
+          document.getElementById('prepMonedas').textContent = pruebaMeta.recompensa_monedas;
+          document.getElementById('prepXp').textContent = pruebaMeta.recompensa_xp;
+          ocultarLoading();
+          document.getElementById('screenPrep').style.display = 'flex';
+        } catch (e) { mostrarError(e.message); }
+      });
+
+      // ── COMENZAR ───────────────────────────────────
+      document.getElementById('btnComenzar').addEventListener('click', async function () {
+        const btn = this;
+        btn.disabled = true; btn.textContent = 'Preparando...';
+        try {
+          const res = await apiPost({ action: 'armar_prueba', id: pruebaId });
+          preguntas = res.preguntas;
+          mapaRespuestas = res._mapa_respuestas;
+          respuestasAlumno = {}; enfocadoIdx = 0;
+
+          if (res.preguntas_repaso > 0) {
+            const el = document.getElementById('prepRepaso');
+            el.textContent = '🔁 Incluye ' + res.preguntas_repaso + ' pregunta(s) de repaso de tu intento anterior.';
+            el.style.display = 'block';
+          }
+
+          document.getElementById('headerTitulo').textContent = pruebaMeta.nombre;
+          document.getElementById('headerSub').textContent = pruebaMeta.asignatura + ' · ' + pruebaMeta.grado + '° Básico · ' + preguntas.length + ' preguntas';
+          document.getElementById('hojaTitulo').textContent = pruebaMeta.nombre;
+          document.getElementById('hojaAsig').textContent = pruebaMeta.asignatura;
+          document.getElementById('hojaGrado').textContent = pruebaMeta.grado + '° Básico';
+
+          document.getElementById('screenPrep').style.display = 'none';
+          document.getElementById('headerFlotante').style.display = 'flex';
+          document.getElementById('btnEntregar').style.display = 'block';
+          document.getElementById('timerDisplay').style.display = 'block';
+
+          renderHoja();
+          renderDots();
+          iniciarScrollObserver();
+          iniciarTimer();
+
+        } catch (e) {
+          btn.disabled = false; btn.textContent = 'COMENZAR EVALUACIÓN';
+          mostrarError(e.message);
+        }
+      });
+
+      // ── TEMPORIZADOR ───────────────────────────────
+      function iniciarTimer() {
+        const el = document.getElementById('timerDisplay');
+        function tick() {
+          if (segundosRestantes <= 0) {
+            clearInterval(timerInterval);
+            el.textContent = '00:00';
+            entregar();
+            return;
+          }
+          segundosRestantes--;
+          const m = Math.floor(segundosRestantes / 60);
+          const s = segundosRestantes % 60;
+          el.textContent = String(m).padStart(2, '0') + ':' + String(s).padStart(2, '0');
+          if (segundosRestantes <= 300) el.classList.add('urgente');
+        }
+        tick();
+        timerInterval = setInterval(tick, 1000);
+      }
+
+      // ── RENDER HOJA ────────────────────────────────
+      function renderHoja() {
+        const lista = document.getElementById('listaPreguntasHoja');
+        lista.innerHTML = '';
+        preguntas.forEach((q, idx) => {
+          const bloque = document.createElement('div');
+          bloque.className = 'bloque-q ' + (idx === 0 ? 'enfocado' : 'lejano');
+          bloque.dataset.idx = idx;
+          const tipoLabel = { seleccion_multiple: 'Selección múltiple', verdadero_falso: 'Verdadero o Falso', unir_conceptos: 'Unir conceptos' }[q.tipo] || q.tipo;
+          bloque.innerHTML = `
+          <div class="bq-tipo">${tipoLabel}</div>
+          <div class="bq-enunciado"><strong style="margin-right:5px;">${idx + 1}.</strong>${q.pregunta}</div>
+          <div class="bq-respuesta" id="resp-${q.id_pregunta}"></div>`;
+          lista.appendChild(bloque);
+          const area = bloque.querySelector('.bq-respuesta');
+          if (q.tipo === 'seleccion_multiple' || q.tipo === 'verdadero_falso') renderOpciones(q, area);
+          else if (q.tipo === 'unir_conceptos') renderUnir(q, area);
+        });
+      }
+
+      // ── OPCIONES ───────────────────────────────────
+      function renderOpciones(q, area) {
+        const esVF = q.tipo === 'verdadero_falso';
+        const div = document.createElement('div');
+        div.className = 'opciones-lista' + (esVF ? ' vf' : '');
+        const opciones = q.opciones || (esVF ? ['Verdadero', 'Falso'] : []);
+        opciones.forEach(op => {
+          const item = document.createElement('div');
+          item.className = 'op-item';
+          item.innerHTML = `<div class="op-circulo"><div class="op-check"></div></div><div class="op-texto">${op}</div>`;
+          item.addEventListener('click', function () {
+            if (entregada) return;
+            respuestasAlumno[q.id_pregunta] = op;
+            div.querySelectorAll('.op-item').forEach(el => el.classList.remove('marcada'));
+            this.classList.add('marcada');
+            actualizarDot(preguntas.findIndex(p => p.id_pregunta === q.id_pregunta));
+          });
+          div.appendChild(item);
+        });
+        area.appendChild(div);
+      }
+
+      // ── UNIR CONCEPTOS ─────────────────────────────
+      function renderUnir(q, area) {
+        const raw = mapaRespuestas[q.id_pregunta];
+        const correctos = Array.isArray(raw) ? raw : [];
+
+        const wrapper = document.createElement('div');
+        wrapper.style.position = 'relative';
+
+        const inst = document.createElement('div');
+        inst.className = 'unir-instruccion';
+        inst.textContent = 'Toca un elemento de la Columna A y luego su par en la Columna B.';
+        wrapper.appendChild(inst);
+
+        const svg = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
+        svg.setAttribute('class', 'unir-svg');
+        svg.id = 'svg-' + q.id_pregunta;
+
+        const grilla = document.createElement('div');
+        grilla.className = 'unir-grilla';
+        grilla.id = 'grilla-' + q.id_pregunta;
+
+        const izqs = correctos.map(p => p.izq);
+        const ders = shuffle([...correctos.map(p => p.der)]);
+
+        const colA = document.createElement('div');
+        const titA = document.createElement('div');
+        titA.className = 'unir-col-titulo'; titA.textContent = 'Columna A';
+        colA.appendChild(titA);
+        izqs.forEach((val, i) => {
+          const btn = document.createElement('button');
+          btn.className = 'unir-btn'; btn.textContent = val;
+          btn.dataset.col = 'izq'; btn.dataset.val = val; btn.dataset.qid = q.id_pregunta;
+          btn.addEventListener('click', () => clickUnir(btn, q, correctos));
+          colA.appendChild(btn);
+        });
+
+        const colB = document.createElement('div');
+        const titB = document.createElement('div');
+        titB.className = 'unir-col-titulo'; titB.textContent = 'Columna B';
+        colB.appendChild(titB);
+        ders.forEach((val, i) => {
+          const btn = document.createElement('button');
+          btn.className = 'unir-btn'; btn.textContent = val;
+          btn.dataset.col = 'der'; btn.dataset.val = val; btn.dataset.qid = q.id_pregunta;
+          btn.addEventListener('click', () => clickUnir(btn, q, correctos));
+          colB.appendChild(btn);
+        });
+
+        grilla.appendChild(colA); grilla.appendChild(colB);
+        wrapper.appendChild(grilla); wrapper.appendChild(svg);
+        area.appendChild(wrapper);
+      }
+
+      function clickUnir(btn, q, correctos) {
+        if (entregada || btn.classList.contains('emparejado')) return;
+        const qid = q.id_pregunta;
+        const col = btn.dataset.col;
+        const val = btn.dataset.val;
+
+        // Desmarcar si ya está emparejado — permite cambiar respuesta
+        if (btn.dataset.colorIdx !== undefined && btn.dataset.colorIdx !== '') {
+          const colorIdx = parseInt(btn.dataset.colorIdx);
+          document.querySelectorAll(`[data-qid="${qid}"].emparejado[data-color-idx="${colorIdx}"]`).forEach(el => {
+            el.classList.remove('emparejado');
+            el.dataset.colorIdx = '';
+            el.style.background = ''; el.style.borderColor = ''; el.style.color = '';
+          });
+          if (respuestasAlumno[qid]) {
+            respuestasAlumno[qid] = respuestasAlumno[qid].filter((_, i) => i !== colorIdx);
+            // Reindexar colores
+            redibujarLineas(qid);
+          }
+          actualizarDot(preguntas.findIndex(p => p.id_pregunta === qid));
+          return;
+        }
+
+        if (col === 'izq') {
+          if (unirSelIzq[qid]) unirSelIzq[qid].el.classList.remove('seleccionado');
+          if (unirSelIzq[qid] && unirSelIzq[qid].val === val) { unirSelIzq[qid] = null; return; }
+          unirSelIzq[qid] = { val, el: btn };
+          btn.classList.add('seleccionado');
+          return;
+        }
+
+        if (!unirSelIzq[qid]) return;
+        const izqVal = unirSelIzq[qid].val;
+        const izqEl = unirSelIzq[qid].el;
+
+        // Cualquier combinación es válida — se evalúa al entregar
+        if (!respuestasAlumno[qid]) respuestasAlumno[qid] = [];
+        const colorIdx = respuestasAlumno[qid].length % COLORES_PARES.length;
+        const color = COLORES_PARES[colorIdx];
+
+        izqEl.classList.remove('seleccionado');
+        [izqEl, btn].forEach(el => {
+          el.classList.add('emparejado');
+          el.dataset.colorIdx = colorIdx;
+          el.style.background = color.bg;
+          el.style.borderColor = color.border;
+          el.style.borderWidth = '1.5px';
+          el.style.color = color.text;
+        });
+
+        unirSelIzq[qid] = null;
+        respuestasAlumno[qid].push({ izq: izqVal, der: val });
+        redibujarLineas(qid);
+
+        if (respuestasAlumno[qid].length === correctos.length) {
+          actualizarDot(preguntas.findIndex(p => p.id_pregunta === qid));
+        }
+      }
+
+      function redibujarLineas(qid) {
+        const svg = document.getElementById('svg-' + qid);
+        const grilla = document.getElementById('grilla-' + qid);
+        if (!svg || !grilla) return;
+        svg.innerHTML = '';
+        const pares = respuestasAlumno[qid] || [];
+        pares.forEach((par, idx) => {
+          const color = COLORES_PARES[idx % COLORES_PARES.length];
+          const izqEl = document.querySelector(`[data-qid="${qid}"][data-col="izq"][data-val="${par.izq}"]`);
+          const derEl = document.querySelector(`[data-qid="${qid}"][data-col="der"][data-val="${par.der}"]`);
+          if (!izqEl || !derEl) return;
+          dibujarLinea(svg, grilla, izqEl, derEl, color.border);
+        });
+      }
+
+      function dibujarLinea(svg, grilla, izqEl, derEl, stroke) {
+        const gr = grilla.getBoundingClientRect();
+        const ir = izqEl.getBoundingClientRect();
+        const dr = derEl.getBoundingClientRect();
+        const x1 = ir.right - gr.left, y1 = ir.top + ir.height / 2 - gr.top;
+        const x2 = dr.left - gr.left, y2 = dr.top + dr.height / 2 - gr.top;
+        const cx = (x1 + x2) / 2;
+        const path = document.createElementNS('http://www.w3.org/2000/svg', 'path');
+        path.setAttribute('d', `M${x1},${y1} C${cx},${y1} ${cx},${y2} ${x2},${y2}`);
+        path.setAttribute('stroke', stroke);
+        path.setAttribute('stroke-width', '1.8');
+        path.setAttribute('fill', 'none');
+        path.setAttribute('stroke-linecap', 'round');
+        path.setAttribute('opacity', '0.85');
+        svg.appendChild(path);
+      }
+
+      // ── DOTS ───────────────────────────────────────
+      function renderDots() {
+        const c = document.getElementById('dotsContainer');
+        c.innerHTML = '';
+        preguntas.forEach((q, i) => {
+          const d = document.createElement('div');
+          d.className = 'dot-prog';
+          if (respuestasAlumno[q.id_pregunta] !== undefined) d.classList.add('respondido');
+          d.textContent = i + 1;
+          c.appendChild(d);
+        });
+      }
+
+      function actualizarDot(idx) {
+        const dots = document.querySelectorAll('.dot-prog');
+        if (dots[idx]) dots[idx].classList.add('respondido');
+      }
+
+      // ── SCROLL ─────────────────────────────────────
+      function iniciarScrollObserver() {
+        function recalcularEnfocado() {
+          const bloques = document.querySelectorAll('.bloque-q');
+          const mid = window.innerHeight / 2;
+          let cercanoIdx = 0, cercaDist = Infinity;
+          bloques.forEach((b, i) => {
+            const dist = Math.abs((b.getBoundingClientRect().top + b.getBoundingClientRect().height / 2) - mid);
+            if (dist < cercaDist) { cercaDist = dist; cercanoIdx = i; }
+          });
+          if (cercanoIdx !== enfocadoIdx) {
+            enfocadoIdx = cercanoIdx;
+            bloques.forEach((b, i) => {
+              b.classList.remove('enfocado', 'adyacente', 'lejano');
+              const d = Math.abs(i - enfocadoIdx);
+              if (d === 0) b.classList.add('enfocado');
+              else if (d === 1) b.classList.add('adyacente');
+              else b.classList.add('lejano');
+            });
+          }
+        }
+        window.addEventListener('scroll', recalcularEnfocado, { passive: true });
+        recalcularEnfocado();
+      }
+
+      // ── ENTREGAR ───────────────────────────────────
+      window.confirmarEntrega = function () {
+        if (entregada) return;
+        const faltantes = preguntas.length - Object.keys(respuestasAlumno).length;
+        const msg = faltantes > 0
+          ? `Tienes ${faltantes} pregunta(s) sin responder. ¿Deseas entregar de todas formas?`
+          : '¿Confirmas que deseas entregar tu evaluación?';
+        document.getElementById('confirmMsg').textContent = msg;
+        document.getElementById('modalConfirmar').classList.add('active');
+        document.getElementById('btnConfirmSi').onclick = function () {
+          document.getElementById('modalConfirmar').classList.remove('active');
+          entregar();
+        };
+      };
+
+      async function entregar() {
+        entregada = true;
+        clearInterval(timerInterval);
+        document.getElementById('btnEntregarPie').disabled = true;
+        document.getElementById('btnEntregar').disabled = true;
+        mostrarLoading('Calculando tu nota...');
+        try {
+          const res = await apiPost({ action: 'registrar_intento', prueba_id: pruebaId, respuestas: respuestasAlumno });
+          // Limpiar caché del modal de refuerzo para que la próxima vez consulte datos frescos
+          try { localStorage.removeItem('educoins_refuerzo_cache_v1'); } catch (e) { }
+          ocultarLoading();
+          mostrarResultado(res.resultado);
+        } catch (e) {
+          ocultarLoading();
+          mostrarError('Error al registrar el resultado: ' + e.message);
+        }
+      }
+
+      // ── RESULTADO ──────────────────────────────────
+      function calcularNotaChilena(pct) {
+        const exigencia = 60;
+        const nota = pct >= exigencia
+          ? 4.0 + ((pct - exigencia) / (100 - exigencia)) * 3.0
+          : 1.0 + (pct / exigencia) * 3.0;
+        return Math.round(nota * 10) / 10;
+      }
+
+      function mostrarResultado(r) {
+        const pct = r.precision_pct;
+        const nota = calcularNotaChilena(pct);
+        const aprobado = nota >= 4.0;
+
+        const notaEl = document.getElementById('notaDisplay');
+        notaEl.textContent = nota.toFixed(1).replace('.', ',');
+        notaEl.className = 'nota-display ' + (aprobado ? 'aprobado' : 'reprobado');
+
+        const badge = document.getElementById('badgeEstado');
+        badge.textContent = aprobado ? 'Aprobado' : 'Reprobado';
+        badge.className = 'badge-estado ' + (aprobado ? 'aprobado' : 'reprobado');
+
+        document.getElementById('chipBuenas').textContent = r.buenas;
+        document.getElementById('chipMalas').textContent = r.malas;
+        document.getElementById('chipTotal').textContent = r.total_preguntas;
+        document.getElementById('finalMonedas').textContent = r.monedas_ganadas;
+        document.getElementById('finalXp').textContent = r.xp_ganado;
+
+        if (r.tiene_repaso) {
+          const av = document.getElementById('repasoAviso');
+          av.style.display = 'block';
+          av.textContent = '¡Sigue practicando! Vuelve a intentarlo para reforzar lo aprendido.';
+        }
+
+        document.getElementById('screenFinal').classList.add('active');
+      }
+
+      // ── REVISAR ────────────────────────────────────
+      window.cerrarModalYRevisar = function () {
+        document.getElementById('screenFinal').classList.remove('active');
+
+        preguntas.forEach(q => {
+          const respAlumno = respuestasAlumno[q.id_pregunta];
+          const correcta = mapaRespuestas[q.id_pregunta];
+          const area = document.getElementById('resp-' + q.id_pregunta);
+          if (!area) return;
+
+          if (q.tipo === 'seleccion_multiple' || q.tipo === 'verdadero_falso') {
+            area.querySelectorAll('.op-item').forEach(el => {
+              const op = el.querySelector('.op-texto').textContent;
+              el.classList.remove('marcada', 'revision-correcta', 'revision-incorrecta');
+              el.style.opacity = '';
+
+              if (op === correcta) {
+                el.classList.add('revision-correcta');
+                const circulo = el.querySelector('.op-circulo');
+                if (circulo) circulo.innerHTML = '<div class="op-check"></div>';
+              }
+              if (op === respAlumno && op !== correcta) {
+                el.classList.add('revision-incorrecta');
+                const circulo = el.querySelector('.op-circulo');
+                if (circulo) circulo.innerHTML = '<span style="font-size:10px;color:white;font-weight:bold;">✕</span>';
+              }
+              if (op !== correcta && op !== respAlumno) {
+                el.style.opacity = '0.45';
+              }
+            });
+
+            const msg = document.createElement('div');
+            msg.style.cssText = 'font-size:11px; font-weight:bold; margin-top:8px; padding-left:4px;';
+
+            if (!respAlumno) {
+              msg.style.color = '#cc3333';
+              msg.textContent = '✗ Sin responder — la correcta era: ' + correcta;
+            } else if (respAlumno === correcta) {
+              msg.style.color = '#2a6a2a';
+              msg.textContent = '✓ Respuesta correcta';
+            } else {
+              msg.style.color = '#cc3333';
+              msg.textContent = '✗ Respuesta incorrecta — la correcta era: ' + correcta;
+            }
+            area.appendChild(msg);
+
+          } else if (q.tipo === 'unir_conceptos') {
+            const correctos = Array.isArray(correcta) ? correcta : [];
+            if (correctos.length === 0) return;
+            const qid = q.id_pregunta;
+            const alumno = respuestasAlumno[qid] || [];
+            const svg = document.getElementById('svg-' + qid);
+            const grilla = document.getElementById('grilla-' + qid);
+            if (!svg || !grilla) return;
+
+            const todoCorrecto = correctos.length === alumno.length && correctos.every(pc =>
+              alumno.some(pa => pa.izq === pc.izq && pa.der === pc.der)
+            );
+
+            if (todoCorrecto) return;
+
+            svg.innerHTML = '';
+
+            document.querySelectorAll(`[data-qid="${qid}"].emparejado`).forEach(el => {
+              el.classList.remove('emparejado');
+              el.dataset.colorIdx = '';
+              el.style.background = ''; el.style.borderColor = ''; el.style.color = '';
+            });
+
+            correctos.forEach((par, idx) => {
+              const color = COLORES_PARES[idx % COLORES_PARES.length];
+              const izqEl = document.querySelector(`[data-qid="${qid}"][data-col="izq"][data-val="${par.izq}"]`);
+              const derEl = document.querySelector(`[data-qid="${qid}"][data-col="der"][data-val="${par.der}"]`);
+              if (!izqEl || !derEl) return;
+              izqEl.style.background = color.bg; izqEl.style.borderColor = color.border; izqEl.style.color = color.text;
+              derEl.style.background = color.bg; derEl.style.borderColor = color.border; derEl.style.color = color.text;
+              dibujarLinea(svg, grilla, izqEl, derEl, color.border);
+            });
+
+            const msg = document.createElement('div');
+            msg.className = 'unir-revision-msg';
+            msg.textContent = alumno.length === 0
+              ? '✗ No respondida — aquí está la respuesta correcta'
+              : '✗ Respuesta incorrecta — aquí está la corrección';
+            area.appendChild(msg);
+          }
+        });
+
+        window.scrollTo({ top: 0, behavior: 'smooth' });
+      };
+
+      // ── UTILS ──────────────────────────────────────
+      function shuffle(arr) {
+        const a = [...arr];
+        for (let i = a.length - 1; i > 0; i--) {
+          const j = Math.floor(Math.random() * (i + 1));
+          [a[i], a[j]] = [a[j], a[i]];
+        }
+        return a;
+      }
+
+    })();
+  </script>
+</body>
+
+</html>

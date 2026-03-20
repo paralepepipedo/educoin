@@ -1,4 +1,4 @@
-<!--
+﻿<!--
   admin/admin.html — Panel de administración EduCoins
   Versión: 1.5.0 — 2026-03-08
   Changelog:
@@ -207,7 +207,8 @@ ACCESO:   Solo usuarios con rol 'admin'
 
   <!-- Clerk: carga síncrona con la clave en el data-attribute -->
   <script data-clerk-publishable-key="pk_test_bG92aW5nLXJhcHRvci0xLmNsZXJrLmFjY291bnRzLmRldiQ"
-    src="https://cdn.jsdelivr.net/npm/@clerk/clerk-js@latest/dist/clerk.browser.js"></script>
+    src="https://lovable-raptor-1.clerk.accounts.dev/npm/@clerk/clerk-js@latest/dist/clerk.browser.js"
+    crossorigin="anonymous"></script>
   <style>
     /* Fix: opciones de select visibles en todos los navegadores */
     #modalEvalAdmin select option {
@@ -249,12 +250,14 @@ ACCESO:   Solo usuarios con rol 'admin'
         </div>
       </div>
 
-      <!-- TABS PRINCIPALES -->
       <div class="admin-tabs fade-up delay-1">
         <button class="admin-tab active" data-tab="resumen">📊 Resumen</button>
         <button class="admin-tab" data-tab="alumnos">👥 Alumnos</button>
         <button class="admin-tab" data-tab="evaluaciones">📅 Evaluaciones</button>
         <button class="admin-tab" data-tab="misiones">🎯 Misiones</button>
+        <button class="admin-tab" onclick="window.location.href='admin_pruebas.html'"
+          style="background:rgba(59, 130, 246, 0.15); color:#60a5fa; border:1px solid rgba(59, 130, 246, 0.3); white-space:nowrap;">📚
+          Creador IA</button>
         <button class="admin-tab" data-tab="monedas">🪙 Monedas</button>
         <button class="admin-tab" data-tab="banco-misiones">📋 Banco</button>
         <button class="admin-tab" data-tab="tienda" style="position:relative">🛒 Tienda<span id="badgeCanjes"
@@ -352,6 +355,9 @@ ACCESO:   Solo usuarios con rol 'admin'
 
         <div class="eval-admin-toolbar">
           <button class="btn-admin btn-primary" id="btnNuevaEval">+ Nueva Evaluación</button>
+          <button onclick="abrirModalCargaMasiva()"
+            style="padding:.6rem .9rem; background:rgba(102,126,234,.15); border:1px solid rgba(102,126,234,.35); border-radius:8px; color:#667eea; font-family:'Press Start 2P',monospace; font-size:.52rem; cursor:pointer; font-weight:900; transition:all .2s">📄
+            Carga Masiva</button>
           <select class="filtro-select" id="filtroEvalGrado">
             <option value="">Todos los grados</option>
             <option value="1">1° Básico</option>
@@ -1044,14 +1050,329 @@ ACCESO:   Solo usuarios con rol 'admin'
     }
   </style>
 
+  <!-- ═══════════════════════════════════════
+     MODAL: CARGA MASIVA DE EVALUACIONES
+═══════════════════════════════════════ -->
+  <div class="modal-overlay" id="modalCargaMasiva"
+    style="display:none; z-index:99999 !important; position:fixed !important; opacity:1; background:rgba(0,0,0,0.85); pointer-events:auto;">
+    <div class="modal-box"
+      style="max-width:900px; max-height:90vh; overflow-y:auto; background:#1a1a35; border:1px solid rgba(96,165,250,.2); border-radius:14px; padding:1.5rem; pointer-events:auto;">
+      <!-- Header -->
+      <div
+        style="display:flex; align-items:center; justify-content:space-between; margin-bottom:1.5rem; padding-bottom:1rem; border-bottom:1px solid rgba(255,255,255,.08)">
+        <h2 style="margin:0; font-family:'Press Start 2P',monospace; font-size:.48rem; color:#fff">
+          📄 Carga Masiva
+        </h2>
+        <button onclick="cerrarModalCargaMasiva()"
+          style="background:transparent; border:none; color:rgba(255,255,255,.4); font-size:1.5rem; cursor:pointer; padding:0; line-height:1">
+          ✕
+        </button>
+      </div>
+
+      <!-- Indicador de pasos -->
+      <div id="cargaMasivaIndicador"
+        style="display:flex; justify-content:space-between; margin-bottom:2rem; position:relative">
+        <div
+          style="position:absolute; top:20px; left:0; right:0; height:2px; background:rgba(255,255,255,.1); z-index:0">
+        </div>
+
+        <div class="step-indicator-item active" data-step="1"
+          style="display:flex; flex-direction:column; align-items:center; position:relative; z-index:1; flex:1">
+          <div class="step-indicator-number"
+            style="width:40px; height:40px; border-radius:50%; background:#667eea; color:white; display:flex; align-items:center; justify-content:center; font-weight:bold; margin-bottom:8px; font-family:'Nunito',sans-serif">
+            1</div>
+          <div style="font-size:11px; color:rgba(255,255,255,.6); text-align:center; font-family:'Nunito',sans-serif">
+            Configuración</div>
+        </div>
+
+        <div class="step-indicator-item" data-step="2"
+          style="display:flex; flex-direction:column; align-items:center; position:relative; z-index:1; flex:1">
+          <div class="step-indicator-number"
+            style="width:40px; height:40px; border-radius:50%; background:rgba(255,255,255,.15); color:rgba(255,255,255,.4); display:flex; align-items:center; justify-content:center; font-weight:bold; margin-bottom:8px; font-family:'Nunito',sans-serif">
+            2</div>
+          <div style="font-size:11px; color:rgba(255,255,255,.4); text-align:center; font-family:'Nunito',sans-serif">
+            Extracción</div>
+        </div>
+
+        <div class="step-indicator-item" data-step="3"
+          style="display:flex; flex-direction:column; align-items:center; position:relative; z-index:1; flex:1">
+          <div class="step-indicator-number"
+            style="width:40px; height:40px; border-radius:50%; background:rgba(255,255,255,.15); color:rgba(255,255,255,.4); display:flex; align-items:center; justify-content:center; font-weight:bold; margin-bottom:8px; font-family:'Nunito',sans-serif">
+            3</div>
+          <div style="font-size:11px; color:rgba(255,255,255,.4); text-align:center; font-family:'Nunito',sans-serif">
+            Confirmación</div>
+        </div>
+      </div>
+
+      <!-- PASO 1: Configuración -->
+      <div id="cargaMasivaPaso1" class="carga-masiva-step active">
+        <div
+          style="background:rgba(250,204,21,.1); border-left:4px solid #facc15; padding:12px; border-radius:6px; margin-bottom:20px; font-size:13px; color:rgba(255,255,255,.8); font-family:'Nunito',sans-serif">
+          ℹ️ Selecciona el colegio y grado al que corresponden las evaluaciones que vas a cargar.
+        </div>
+
+        <div style="margin-bottom:1.2rem">
+          <label
+            style="font-size:.7rem; color:rgba(255,255,255,.55); font-weight:700; display:block; margin-bottom:.4rem; font-family:'Nunito',sans-serif">Colegio
+            *</label>
+          <select id="cargaMasivaColegio"
+            style="width:100%; background:#1a1a35; border:1px solid rgba(255,255,255,.12); border-radius:8px; padding:.7rem .9rem; color:#fff; font-family:'Nunito',sans-serif; font-size:.88rem; color-scheme:dark;">
+            <option value="">Seleccionar colegio...</option>
+          </select>
+        </div>
+
+        <div style="margin-bottom:1.2rem">
+          <label
+            style="font-size:.7rem; color:rgba(255,255,255,.55); font-weight:700; display:block; margin-bottom:.4rem; font-family:'Nunito',sans-serif">Grado
+            *</label>
+          <select id="cargaMasivaGrado"
+            style="width:100%; background:#1a1a35; border:1px solid rgba(255,255,255,.12); border-radius:8px; padding:.7rem .9rem; color:#fff; font-family:'Nunito',sans-serif; font-size:.88rem; color-scheme:dark;">
+            <option value="">Seleccionar grado...</option>
+            <option value="1">1° Básico</option>
+            <option value="2">2° Básico</option>
+            <option value="3">3° Básico</option>
+            <option value="4">4° Básico</option>
+            <option value="5">5° Básico</option>
+            <option value="6">6° Básico</option>
+            <option value="7">7° Básico</option>
+            <option value="8">8° Básico</option>
+          </select>
+        </div>
+
+        <div
+          style="display:flex; justify-content:flex-end; margin-top:2rem; padding-top:1rem; border-top:1px solid rgba(255,255,255,.08)">
+          <button onclick="irPasoCargaMasiva(2)"
+            style="padding:.7rem 1.5rem; background:#667eea; border:none; border-radius:8px; color:white; font-family:'Press Start 2P',monospace; font-size:.32rem; cursor:pointer">Continuar
+            →</button>
+        </div>
+      </div>
+
+      <!-- PASO 2: Extracción con IA -->
+      <div id="cargaMasivaPaso2" class="carga-masiva-step" style="display:none">
+        <div
+          style="background:rgba(250,204,21,.1); border-left:4px solid #facc15; padding:12px; border-radius:6px; margin-bottom:20px; font-size:13px; color:rgba(255,255,255,.8); font-family:'Nunito',sans-serif">
+          💡 Usa una IA externa para extraer las evaluaciones del PDF. Es más preciso y confiable.
+        </div>
+
+        <div style="margin-bottom:1.5rem">
+          <label
+            style="font-size:.75rem; color:rgba(255,255,255,.55); font-weight:700; display:block; margin-bottom:.6rem; font-family:'Nunito',sans-serif">
+            1️⃣ Copia este prompt
+          </label>
+          <div style="position:relative">
+            <textarea id="promptExtraer" readonly
+              style="width:100%; min-height:180px; background:rgba(255,255,255,.06); border:1px solid rgba(255,255,255,.12); border-radius:8px; padding:.9rem; color:rgba(255,255,255,.7); font-family:'Courier New',monospace; font-size:.75rem; resize:none">Extrae todas las evaluaciones de este calendario escolar y devuélvelas en formato JSON.
+
+Para cada evaluación incluye:
+- fecha: formato "YYYY-MM-DD" (mes detectado del título, año 2026)
+- asignatura: normalizada a: Matematicas, Lenguaje, Historia, Ciencias, Ingles, Ed. Fisica, Musica, Artes, Tecnologia
+- tipo: clasificado como: prueba, trabajo, tarea, disertacion, laboratorio
+- contenidos: descripción completa de los contenidos
+
+Responde SOLO con el array JSON, sin markdown, sin explicaciones.
+
+Ejemplo de formato:
+[
+  {"fecha":"2026-03-18","asignatura":"Tecnologia","tipo":"prueba","contenidos":"Creación de una presentación digital con al menos 5 diapositivas"},
+  {"fecha":"2026-03-19","asignatura":"Artes","tipo":"prueba","contenidos":"Pintura con solo una pareja de colores complementarios"}
+]</textarea>
+            <button onclick="copiarPrompt()"
+              style="position:absolute; top:8px; right:8px; padding:.4rem .8rem; background:#667eea; border:none; border-radius:6px; color:white; font-family:'Nunito',sans-serif; font-size:.75rem; font-weight:600; cursor:pointer">
+              📋 Copiar
+            </button>
+          </div>
+        </div>
+
+        <div style="margin-bottom:1.5rem">
+          <label
+            style="font-size:.75rem; color:rgba(255,255,255,.55); font-weight:700; display:block; margin-bottom:.6rem; font-family:'Nunito',sans-serif">
+            2️⃣ Abre una IA, pega el prompt y sube tu PDF
+          </label>
+          <div style="display:grid; grid-template-columns:repeat(2, 1fr); gap:.6rem">
+            <a href="https://gemini.google.com" target="_blank"
+              style="display:flex; align-items:center; gap:.5rem; padding:.6rem .8rem; background:rgba(66,133,244,.15); border:1px solid rgba(66,133,244,.3); border-radius:8px; color:#4285f4; text-decoration:none; font-family:'Nunito',sans-serif; font-size:.8rem; font-weight:600; transition:all .2s">
+              <span style="font-size:1.2rem">🔷</span> Gemini
+            </a>
+            <a href="https://claude.ai" target="_blank"
+              style="display:flex; align-items:center; gap:.5rem; padding:.6rem .8rem; background:rgba(168,85,247,.15); border:1px solid rgba(168,85,247,.3); border-radius:8px; color:#a855f7; text-decoration:none; font-family:'Nunito',sans-serif; font-size:.8rem; font-weight:600; transition:all .2s">
+              <span style="font-size:1.2rem">🟣</span> Claude
+            </a>
+            <a href="https://chat.openai.com" target="_blank"
+              style="display:flex; align-items:center; gap:.5rem; padding:.6rem .8rem; background:rgba(16,163,127,.15); border:1px solid rgba(16,163,127,.3); border-radius:8px; color:#10a37f; text-decoration:none; font-family:'Nunito',sans-serif; font-size:.8rem; font-weight:600; transition:all .2s">
+              <span style="font-size:1.2rem">🟢</span> ChatGPT
+            </a>
+            <a href="https://chat.deepseek.com" target="_blank"
+              style="display:flex; align-items:center; gap:.5rem; padding:.6rem .8rem; background:rgba(59,130,246,.15); border:1px solid rgba(59,130,246,.3); border-radius:8px; color:#3b82f6; text-decoration:none; font-family:'Nunito',sans-serif; font-size:.8rem; font-weight:600; transition:all .2s">
+              <span style="font-size:1.2rem">🔵</span> DeepSeek
+            </a>
+          </div>
+        </div>
+
+        <div style="margin-bottom:1.2rem">
+          <label
+            style="font-size:.75rem; color:rgba(255,255,255,.55); font-weight:700; display:block; margin-bottom:.6rem; font-family:'Nunito',sans-serif">
+            3️⃣ Pega aquí el JSON que te devuelva la IA
+          </label>
+          <textarea id="cargaMasivaTexto" placeholder='[
+  {"fecha":"2026-03-18","asignatura":"Tecnologia","tipo":"prueba","contenidos":"Creación de presentación digital..."},
+  {"fecha":"2026-03-19","asignatura":"Artes","tipo":"prueba","contenidos":"Pintura con colores complementarios..."}
+]' style="width:100%; min-height:220px; background:rgba(255,255,255,.06); border:1px solid rgba(255,255,255,.12); border-radius:8px; padding:.9rem; color:white; font-family:'Courier New',monospace; font-size:.85rem; resize:vertical"></textarea>
+        </div>
+
+        <div
+          style="display:flex; justify-content:space-between; margin-top:2rem; padding-top:1rem; border-top:1px solid rgba(255,255,255,.08)">
+          <button onclick="irPasoCargaMasiva(1)"
+            style="padding:.7rem 1.2rem; background:rgba(255,255,255,.06); border:1px solid rgba(255,255,255,.12); border-radius:8px; color:rgba(255,255,255,.7); font-family:'Press Start 2P',monospace; font-size:.32rem; cursor:pointer">←
+            Volver</button>
+          <button onclick="procesarTextoCargaMasiva()"
+            style="padding:.7rem 1.5rem; background:#667eea; border:none; border-radius:8px; color:white; font-family:'Press Start 2P',monospace; font-size:.32rem; cursor:pointer">Procesar
+            JSON →</button>
+        </div>
+      </div>
+
+      <!-- PASO 3: Confirmación -->
+      <div id="cargaMasivaPaso3" class="carga-masiva-step" style="display:none">
+        <div
+          style="background:rgba(250,204,21,.1); border-left:4px solid #facc15; padding:12px; border-radius:6px; margin-bottom:20px; font-size:13px; color:rgba(255,255,255,.8); font-family:'Nunito',sans-serif">
+          ℹ️ Revisa las evaluaciones detectadas. Puedes editar, eliminar o deseleccionar las que no necesites.
+        </div>
+
+        <div
+          style="display:flex; justify-content:space-between; align-items:center; margin-bottom:20px; padding:12px; background:rgba(255,255,255,.04); border-radius:8px">
+          <div style="font-size:13px; color:rgba(255,255,255,.7); font-family:'Nunito',sans-serif">
+            <strong>Colegio:</strong> <span id="confirmColegio"></span> | <strong>Grado:</strong> <span
+              id="confirmGrado"></span>
+          </div>
+          <span id="contadorEvals"
+            style="background:#667eea; color:white; padding:4px 14px; border-radius:12px; font-weight:600; font-size:13px; font-family:'Nunito',sans-serif">0
+            evaluaciones</span>
+        </div>
+
+        <div
+          style="background:rgba(102,126,234,.1); padding:12px; border-radius:8px; margin-bottom:16px; display:flex; align-items:center; gap:10px">
+          <input type="checkbox" id="selectAllEvals" checked style="width:18px; height:18px; cursor:pointer">
+          <label for="selectAllEvals"
+            style="margin:0; font-weight:600; cursor:pointer; font-size:14px; font-family:'Nunito',sans-serif">Seleccionar
+            todas (<span id="totalEvals">0</span>)</label>
+        </div>
+
+        <div id="listaEvalsDetectadas" style="max-height:420px; overflow-y:auto; margin-bottom:20px"></div>
+
+        <div
+          style="display:flex; justify-content:space-between; margin-top:2rem; padding-top:1rem; border-top:1px solid rgba(255,255,255,.08)">
+          <button onclick="irPasoCargaMasiva(2)"
+            style="padding:.7rem 1.2rem; background:rgba(255,255,255,.06); border:1px solid rgba(255,255,255,.12); border-radius:8px; color:rgba(255,255,255,.7); font-family:'Press Start 2P',monospace; font-size:.32rem; cursor:pointer">←
+            Volver</button>
+          <button id="btnGuardarCargaMasiva" onclick="guardarEvaluacionesMasivas()"
+            style="padding:.7rem 1.5rem; background:#4ade80; border:none; border-radius:8px; color:#0a1a0f; font-family:'Press Start 2P',monospace; font-size:.32rem; cursor:pointer; font-weight:900">💾
+            Guardar seleccionadas (0 de 0)</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <style>
+    .carga-masiva-step {
+      animation: fadeIn 0.3s ease-in;
+    }
+
+    @keyframes fadeIn {
+      from {
+        opacity: 0;
+        transform: translateY(10px);
+      }
+
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+
+    .step-indicator-item.active .step-indicator-number {
+      background: #667eea !important;
+      color: white !important;
+    }
+
+    .step-indicator-item.completed .step-indicator-number {
+      background: #48bb78 !important;
+      color: white !important;
+    }
+
+    .metodo-entrada-option.active {
+      border-color: #667eea !important;
+      background: rgba(102, 126, 234, .1) !important;
+    }
+
+    .metodo-entrada-option.active div:last-child {
+      color: white !important;
+    }
+
+    #uploadZone.active {
+      border-color: #667eea !important;
+      background: rgba(102, 126, 234, .08) !important;
+    }
+
+    .eval-detectada-card {
+      border: 2px solid rgba(255, 255, 255, .12);
+      border-radius: 8px;
+      padding: 14px;
+      margin-bottom: 12px;
+      background: rgba(255, 255, 255, .03);
+      transition: all .3s ease;
+    }
+
+    .eval-detectada-card:hover {
+      border-color: rgba(102, 126, 234, .4);
+      background: rgba(255, 255, 255, .05);
+    }
+
+    .eval-detectada-card.selected {
+      border-color: #667eea;
+      background: rgba(102, 126, 234, .08);
+    }
+
+    #listaEvalsDetectadas::-webkit-scrollbar {
+      width: 8px;
+    }
+
+    #listaEvalsDetectadas::-webkit-scrollbar-track {
+      background: rgba(255, 255, 255, .05);
+      border-radius: 4px;
+    }
+
+    #listaEvalsDetectadas::-webkit-scrollbar-thumb {
+      background: rgba(255, 255, 255, .2);
+      border-radius: 4px;
+    }
+
+    #listaEvalsDetectadas::-webkit-scrollbar-thumb:hover {
+      background: rgba(255, 255, 255, .3);
+    }
+
+    /* Fix para options de los selectores del modal */
+    #modalCargaMasiva select option {
+      background: #1a1a35;
+      color: #fff;
+    }
+
+    #modalCargaMasiva select {
+      color-scheme: dark;
+    }
+  </style>
+
   <div class="toast-container" id="toastContainer"></div>
 
   <!-- Auth: config → guard → shared → módulo (orden obligatorio) -->
+  <!-- PDF.js para extracción de texto -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js"></script>
+  <script>pdfjsLib.GlobalWorkerOptions.workerSrc = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js';</script>
+
   <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
   <script src="../auth/clerk-config.js"></script>
   <script src="../shared/clerk-guard.js"></script>
   <script src="../shared/shared.js"></script>
   <script src="admin.js"></script>
+  <script src="cargaMasiva.js"></script>
   <script>
     // ── PATCH v1.6.1: _renderTablaActividad global + carga directa ──
 

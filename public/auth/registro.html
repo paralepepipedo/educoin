@@ -385,7 +385,9 @@
 
   <!-- SDK de Clerk con la clave en el data-attribute -->
   <script data-clerk-publishable-key="pk_test_bG92aW5nLXJhcHRvci0xLmNsZXJrLmFjY291bnRzLmRldiQ"
-    src="https://cdn.jsdelivr.net/npm/@clerk/clerk-js@latest/dist/clerk.browser.js"></script>
+    src="https://lovable-raptor-1.clerk.accounts.dev/npm/@clerk/clerk-js@latest/dist/clerk.browser.js"
+    crossorigin="anonymous"></script>
+
 
 </head>
 
@@ -625,51 +627,96 @@
           return;
         }
 
-        await window.Clerk.load();
-
-        // Si ya tiene sesión activa → dashboard
-        if (window.Clerk.user) {
-          window.location.href = base + '/dashboard/dashboard.html';
+        try {
+          await window.Clerk.load();
+        } catch (err) {
+          console.error('[registro] Error Clerk.load():', err);
+          mostrarFormularioRegistro();
           return;
         }
 
-        window.Clerk.mountSignUp(
-          document.getElementById('clerk-sign-up'),
-          {
-            appearance: {
-              variables: {
-                colorPrimary: '#7c3aed',
-                colorBackground: '#0f0f2e',
-                colorInputBackground: '#1a1a3e',
-                colorInputText: '#e2e8f0',
-                colorText: '#e2e8f0',
-                colorTextSecondary: '#94a3b8',
-                colorDanger: '#ef4444',
-                colorSuccess: '#22c55e',
-                borderRadius: '12px',
-                fontFamily: "'Nunito', sans-serif",
-              },
-              elements: {
-                logoImage: { display: 'none' },
-                card: {
-                  background: '#0f0f2e',
-                  border: '1px solid rgba(124,58,237,0.3)',
-                  boxShadow: '0 0 40px rgba(124,58,237,0.12)',
-                  borderRadius: '20px',
-                },
-                formButtonPrimary: {
-                  background: 'linear-gradient(135deg,#7c3aed,#6d28d9)',
-                  fontFamily: "'Press Start 2P',monospace",
-                  fontSize: '0.5rem',
-                },
-              },
-            },
-            // Después del registro exitoso → dashboard
-            redirectUrl: base + '/dashboard/dashboard.html',
-            signInUrl: base + '/auth/login.html',
+        // Si ya tiene sesión activa completa → dashboard
+        // Si tiene sesión incompleta (OAuth sin perfil) → cerrarla para empezar limpio
+        if (window.Clerk.user) {
+          try {
+            var token = await window.Clerk.session.getToken();
+            var check = await fetch(base + '/api/perfil', {
+              headers: { 'Authorization': 'Bearer ' + token }
+            });
+            if (check.ok) {
+              window.location.href = base + '/dashboard/dashboard.html';
+              return;
+            } else {
+              await window.Clerk.signOut();
+              window.location.reload();
+              return;
+            }
+          } catch (e) {
+            await window.Clerk.signOut();
+            window.location.reload();
+            return;
           }
-        );
+        }
+
+        // Mostrar formulario custom
+        mostrarFormularioRegistro();
       }
+
+      function mostrarFormularioRegistro() {
+        document.getElementById('clerk-sign-up').innerHTML =
+          '<div style="background:#0f0f2e;border:1px solid rgba(124,58,237,0.3);border-radius:20px;padding:2rem;box-shadow:0 0 60px rgba(124,58,237,0.15)">' +
+          '<div style="font-family:\'Press Start 2P\',monospace;font-size:.5rem;color:#a855f7;margin-bottom:1.5rem;text-align:center">CREAR CUENTA</div>' +
+
+          '<div style="margin-bottom:1rem">' +
+          '<label style="display:block;font-size:.72rem;font-weight:800;color:#94a3b8;margin-bottom:.4rem">NOMBRE DE USUARIO</label>' +
+          '<input id="regUsername" type="text" placeholder="tucapitan123" style="width:100%;background:#1a1a3e;border:1px solid rgba(124,58,237,0.3);border-radius:10px;padding:.75rem 1rem;color:#e2e8f0;font-size:.95rem;font-family:Nunito,sans-serif;outline:none"/>' +
+          '<div style="font-size:.7rem;color:#64748b;margin-top:.3rem;font-weight:700">Sin espacios, solo letras y números</div>' +
+          '</div>' +
+
+          '<label style="display:block;font-size:.72rem;font-weight:800;color:#94a3b8;margin-bottom:.4rem">CORREO ELECTRÓNICO</label>' +
+          '<input id="regEmail" type="email" placeholder="tu@correo.com" style="width:100%;background:#1a1a3e;border:1px solid rgba(124,58,237,0.3);border-radius:10px;padding:.75rem 1rem;color:#e2e8f0;font-size:.95rem;font-family:Nunito,sans-serif;outline:none"/>' +
+          '<div style="font-size:.7rem;color:#64748b;margin-top:.3rem;font-weight:700">Necesario para recuperar tu contraseña</div>' +
+
+          '<div style="margin-bottom:1rem">' +
+          '<label style="display:block;font-size:.72rem;font-weight:800;color:#94a3b8;margin-bottom:.4rem">CONTRASEÑA</label>' +
+          '<div style="position:relative">' +
+          '<input id="regPassword" type="password" placeholder="Mínimo 4 caracteres" style="width:100%;background:#1a1a3e;border:1px solid rgba(124,58,237,0.3);border-radius:10px;padding:.75rem 3rem .75rem 1rem;color:#e2e8f0;font-size:.95rem;font-family:Nunito,sans-serif;outline:none"/>' +
+          '<button type="button" id="togglePassword" onclick="togglePasswordVisibility(\'regPassword\', \'togglePassword\')" style="position:absolute;right:12px;top:50%;transform:translateY(-50%);background:none;border:none;cursor:pointer;font-size:1.2rem;padding:0;width:24px;height:24px;display:flex;align-items:center;justify-content:center">👁️</button>' +
+          '</div>' +
+          '</div>' +
+
+          '<div style="margin-bottom:1.5rem">' +
+          '<label style="display:block;font-size:.72rem;font-weight:800;color:#94a3b8;margin-bottom:.4rem">CONFIRMAR CONTRASEÑA</label>' +
+          '<div style="position:relative">' +
+          '<input id="regPasswordConfirm" type="password" placeholder="Repite tu contraseña" style="width:100%;background:#1a1a3e;border:1px solid rgba(124,58,237,0.3);border-radius:10px;padding:.75rem 3rem .75rem 1rem;color:#e2e8f0;font-size:.95rem;font-family:Nunito,sans-serif;outline:none"/>' +
+          '<button type="button" id="togglePasswordConfirm" onclick="togglePasswordVisibility(\'regPasswordConfirm\', \'togglePasswordConfirm\')" style="position:absolute;right:12px;top:50%;transform:translateY(-50%);background:none;border:none;cursor:pointer;font-size:1.2rem;padding:0;width:24px;height:24px;display:flex;align-items:center;justify-content:center">👁️</button>' +
+          '</div>' +
+          '</div>' +
+
+          '<div id="regError" style="display:none;background:rgba(239,68,68,.1);border:1px solid rgba(239,68,68,.4);border-radius:8px;padding:.75rem;color:#fca5a5;font-size:.8rem;font-weight:700;margin-bottom:1rem;text-align:center"></div>' +
+
+          '<button id="regBtn" onclick="registrarUsuario()" style="width:100%;background:linear-gradient(135deg,#7c3aed,#6d28d9);border:none;border-radius:12px;padding:.875rem;color:#fff;font-family:\'Press Start 2P\',monospace;font-size:.45rem;cursor:pointer;box-shadow:0 4px 20px rgba(124,58,237,.4);margin-bottom:1rem">🚀 CREAR MI CUENTA</button>' +
+
+          '<div style="margin:1.25rem 0;display:flex;align-items:center;gap:.75rem"><div style="flex:1;height:1px;background:rgba(255,255,255,.1)"></div><span style="color:#64748b;font-size:.75rem;font-weight:700">O</span><div style="flex:1;height:1px;background:rgba(255,255,255,.1)"></div></div>' +
+
+          '<button onclick="registroGoogle()" style="width:100%;background:#fff;border:none;border-radius:12px;padding:.875rem;color:#1a1a1a;font-family:Nunito,sans-serif;font-weight:800;font-size:.95rem;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:.75rem"><img src="https://www.google.com/favicon.ico" style="width:18px;height:18px"> Registrarse con Google</button>' +
+
+          '</div>';
+
+        // Enter para submit
+        setTimeout(function () {
+          var fields = ['regUsername', 'regEmail', 'regPassword', 'regPasswordConfirm'];
+          fields.forEach(function (id) {
+            var el = document.getElementById(id);
+            if (el) el.addEventListener('keydown', function (e) {
+              if (e.key === 'Enter') registrarUsuario();
+            });
+          });
+        }, 100);
+      }
+
+
+
 
       // ——————————————————————————————————
       // CREAR PERFIL — modo OAuth (?nuevo=true)
@@ -722,6 +769,174 @@
       }
 
     })();
+    function togglePasswordVisibility(inputId, buttonId) {
+      var input = document.getElementById(inputId);
+      var button = document.getElementById(buttonId);
+
+      if (input.type === 'password') {
+        input.type = 'text';
+        button.textContent = '🙈';
+      } else {
+        input.type = 'password';
+        button.textContent = '👁️';
+      }
+    }
+    async function registrarUsuario() {
+      var base = window.EDUCOINS_BASE || '';
+      var username = document.getElementById('regUsername').value.trim();
+      var email = document.getElementById('regEmail').value.trim();
+      var password = document.getElementById('regPassword').value;
+      var passwordConfirm = document.getElementById('regPasswordConfirm').value;
+      var errorEl = document.getElementById('regError');
+      var btn = document.getElementById('regBtn');
+
+      // Validaciones
+      if (!username) {
+        errorEl.textContent = 'Debes ingresar un nombre de usuario';
+        errorEl.style.display = 'block';
+        return;
+      }
+
+      if (username.length < 3) {
+        errorEl.textContent = 'El nombre de usuario debe tener al menos 3 caracteres';
+        errorEl.style.display = 'block';
+        return;
+      }
+
+      if (!/^[a-zA-Z0-9_]+$/.test(username)) {
+        errorEl.textContent = 'Solo letras, números y guión bajo en el nombre de usuario';
+        errorEl.style.display = 'block';
+        return;
+      }
+      if (!email) {
+        errorEl.textContent = 'Debes ingresar tu correo electrónico';
+        errorEl.style.display = 'block';
+        return;
+      }
+
+      if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
+        errorEl.textContent = 'Ingresa un correo válido';
+        errorEl.style.display = 'block';
+        return;
+      }
+      if (!password) {
+        errorEl.textContent = 'Debes ingresar una contraseña';
+        errorEl.style.display = 'block';
+        return;
+      }
+
+      if (password.length < 4) {
+        errorEl.textContent = 'La contraseña debe tener al menos 4 caracteres';
+        errorEl.style.display = 'block';
+        return;
+      }
+
+      if (password !== passwordConfirm) {
+        errorEl.textContent = 'Las contraseñas no coinciden';
+        errorEl.style.display = 'block';
+        return;
+      }
+
+      btn.textContent = '⏳ Creando cuenta...';
+      btn.disabled = true;
+      errorEl.style.display = 'none';
+
+      try {
+        // Crear cuenta en Clerk
+        var signUpData = {
+          emailAddress: email,
+          password: password,
+        };
+
+        // Solo agregar email si lo ingresó
+        if (email) {
+          signUpData.emailAddress = email;
+        }
+
+        var result = await window.Clerk.client.signUp.create(signUpData);
+
+        // En Clerk con username + password (sin verificación email), el status debería ser 'complete'
+        if (result.status === 'complete') {
+          await window.Clerk.setActive({ session: result.createdSessionId });
+
+          // Obtener token y crear perfil en nuestra BD
+          var token = await window.Clerk.session.getToken();
+          var grado = sessionStorage.getItem('educoins_grado_registro');
+          var colegioId = sessionStorage.getItem('educoins_colegio_id');
+
+          var respPerfil = await fetch(base + '/api/perfil', {
+            method: 'POST',
+            headers: {
+              'Authorization': 'Bearer ' + token,
+              'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({
+              nombre: username,
+              email: email || '',
+              grado_ingreso: parseInt(grado) || 1,
+              anio_ingreso: new Date().getFullYear(),
+              colegio_id: colegioId || null,
+            }),
+          });
+
+          if (!respPerfil.ok) {
+            throw new Error('Error al crear el perfil en la base de datos');
+          }
+
+          // Redirigir al dashboard
+          window.location.href = base + '/dashboard/dashboard.html';
+
+        } else {
+          // Si requiere verificación adicional
+          errorEl.textContent = 'Se requiere verificación. Revisa tu correo.';
+          errorEl.style.display = 'block';
+          btn.textContent = '🚀 CREAR MI CUENTA';
+          btn.disabled = false;
+        }
+
+      } catch (err) {
+        console.error('[registro] Error:', err);
+        var msg = 'Error al crear la cuenta';
+
+        if (err.errors && err.errors[0]) {
+          var clerkError = err.errors[0];
+          if (clerkError.code === 'form_identifier_exists') {
+            msg = 'Ya existe una cuenta con este correo electrónico';
+          } else if (clerkError.code === 'form_password_pwned') {
+            msg = 'Esta contraseña es muy común. Usa otra más segura';
+          } else if (clerkError.code === 'form_password_length_too_short') {
+            msg = 'La contraseña debe tener al menos 4 caracteres';
+          } else if (clerkError.code === 'form_param_format_invalid') {
+            msg = 'El formato del correo no es válido';
+          } else if (clerkError.code === 'form_password_incorrect') {
+            msg = 'Contraseña incorrecta';
+          } else {
+            // Mostrar el mensaje específico de Clerk en vez de genérico
+            msg = clerkError.longMessage || clerkError.message || 'Error al crear la cuenta';
+          }
+        } else if (err.message) {
+          msg = err.message;
+        }
+
+        errorEl.textContent = msg;
+        errorEl.style.display = 'block';
+        btn.textContent = '🚀 CREAR MI CUENTA';
+        btn.disabled = false;
+      }
+    }
+
+    async function registroGoogle() {
+      try {
+        await window.Clerk.client.signUp.authenticateWithRedirect({
+          strategy: 'oauth_google',
+          redirectUrl: base + '/auth/sso-callback.html',
+          redirectUrlComplete: base + '/auth/registro.html?nuevo=true',
+        });
+      } catch (err) {
+        console.error('[registro] Google OAuth error:', err);
+        alert('Error al conectar con Google. Intenta recargar la página.');
+      }
+    }
   </script>
 
 </body>

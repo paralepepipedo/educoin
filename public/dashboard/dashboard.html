@@ -43,7 +43,8 @@ SCRIPTS:  dashboard.js
 
   <!-- Clerk: carga síncrona en el head con la clave en el data-attribute -->
   <script data-clerk-publishable-key="pk_test_bG92aW5nLXJhcHRvci0xLmNsZXJrLmFjY291bnRzLmRldiQ"
-    src="https://cdn.jsdelivr.net/npm/@clerk/clerk-js@latest/dist/clerk.browser.js"></script>
+    src="https://lovable-raptor-1.clerk.accounts.dev/npm/@clerk/clerk-js@latest/dist/clerk.browser.js"
+    crossorigin="anonymous"></script>
 </head>
 
 <body>
@@ -154,6 +155,17 @@ SCRIPTS:  dashboard.js
     </div>
 
     <style>
+      /* Compensar altura del header fijo */
+      .main {
+        padding-top: 80px;
+      }
+
+      @media (max-width: 600px) {
+        .main {
+          padding-top: 72px;
+        }
+      }
+
       /* Stats grid responsive — 2 cols en móvil */
       @media (max-width: 640px) {
         .stats-grid {

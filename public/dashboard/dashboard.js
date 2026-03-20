@@ -72,6 +72,11 @@ var MISION_NAV = {
 // 2. INICIALIZACIÓN
 // ============================================
 document.addEventListener('DOMContentLoaded', () => {
+  // Limpiar caché de sesión anterior al entrar a dashboard
+  try {
+    localStorage.removeItem('educoins_perfil_v1');
+  } catch (e) { }
+
   initShared('dashboard');
   renderSaludo();
   renderStats();      // ← render inmediato con mock para que nunca quede en —
