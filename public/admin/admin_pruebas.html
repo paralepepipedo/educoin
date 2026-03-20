@@ -22,17 +22,21 @@
       min-width: 0 !important;
       flex: unset !important;
     }
+
     .admin-tabs {
       gap: .3rem !important;
       flex-wrap: wrap !important;
     }
+
     .main {
       padding-top: 5rem !important;
     }
   </style>
 
+  <!-- Clerk: carga síncrona con la clave en el data-attribute -->
   <script data-clerk-publishable-key="pk_test_bG92aW5nLXJhcHRvci0xLmNsZXJrLmFjY291bnRzLmRldiQ"
-    src="https://cdn.jsdelivr.net/npm/@clerk/clerk-js@latest/dist/clerk.browser.js"></script>
+    src="https://lovable-raptor-1.clerk.accounts.dev/npm/@clerk/clerk-js@latest/dist/clerk.browser.js"
+    crossorigin="anonymous"></script>
 </head>
 
 <body>
@@ -65,10 +69,11 @@
         <div class="admin-card"
           style="margin-bottom:1.5rem; border:1px dashed rgba(16, 185, 129, 0.4); background:rgba(16, 185, 129, 0.05);">
           <div style="display:flex; justify-content:space-between; align-items:center; cursor:pointer;"
-               onclick="(function(el){ el.style.display = el.style.display === 'none' ? 'block' : 'none'; })(document.getElementById('promptBody')); this.querySelector('.prompt-toggle').textContent = document.getElementById('promptBody').style.display === 'none' ? '▼ Mostrar' : '▲ Ocultar'">
+            onclick="(function(el){ el.style.display = el.style.display === 'none' ? 'block' : 'none'; })(document.getElementById('promptBody')); this.querySelector('.prompt-toggle').textContent = document.getElementById('promptBody').style.display === 'none' ? '▼ Mostrar' : '▲ Ocultar'">
             <span style="font-weight:800; color:#10b981;">📝 Prompt Maestro (Copia y pega en la IA)</span>
             <div style="display:flex; gap:0.5rem; align-items:center;">
-              <span class="prompt-toggle" style="color:var(--text-dim); font-size:0.8rem; font-weight:700;">▼ Mostrar</span>
+              <span class="prompt-toggle" style="color:var(--text-dim); font-size:0.8rem; font-weight:700;">▼
+                Mostrar</span>
             </div>
           </div>
           <!-- Colapsado por defecto -->
@@ -79,24 +84,25 @@
                 style="background:rgba(16,185,129,0.2); color:#10b981; border:none;">📋 Copiar</button>
             </div>
             <div id="promptText"
-              style="font-family:monospace; font-size:0.75rem; color:var(--text-dim); white-space:pre-wrap; background:rgba(0,0,0,0.2); border-radius:6px; padding:1rem;">Actúa como un profesor experto en educación básica de Chile.
-Necesito que generes una batería de [CANTIDAD] preguntas sobre la asignatura de [ASIGNATURA],
-específicamente sobre la Unidad: [TEMA] para alumnos de [GRADO] Básico.
+              style="font-family:monospace; font-size:0.75rem; color:var(--text-dim); white-space:pre-wrap; background:rgba(0,0,0,0.2); border-radius:6px; padding:1rem;">
+              Actúa como un profesor experto en educación básica de Chile.
+              Necesito que generes una batería de [CANTIDAD] preguntas sobre la asignatura de [ASIGNATURA],
+              específicamente sobre la Unidad: [TEMA] para alumnos de [GRADO] Básico.
 
-Las preguntas deben tener 3 formatos diferentes:
-1. Selección Múltiple (3 o 4 opciones).
-2. Verdadero o Falso.
-3. Unir Conceptos (3 pares lógicos por pregunta).
+              Las preguntas deben tener 3 formatos diferentes:
+              1. Selección Múltiple (3 o 4 opciones).
+              2. Verdadero o Falso.
+              3. Unir Conceptos (3 pares lógicos por pregunta).
 
-REGLAS ESTRICTAS DE FORMATO:
-Devuelve ÚNICAMENTE un arreglo JSON válido. Cada pregunta debe tener:
-- "id_pregunta": ID único (ej. "hist_u1_001").
-- "tipo": "seleccion_multiple", "verdadero_falso" o "unir_conceptos".
-- "pregunta": El enunciado claro.
-- "imagen_url": (Opcional) URL pública terminada en .jpg/.png o null.
-- "opciones": (Solo múltiple y V/F) Arreglo de strings.
-- "correcta": (Solo múltiple y V/F) El string exacto de la respuesta correcta.
-- "pares": (Solo unir_conceptos) Arreglo de objetos con "izq" y "der".</div>
+              REGLAS ESTRICTAS DE FORMATO:
+              Devuelve ÚNICAMENTE un arreglo JSON válido. Cada pregunta debe tener:
+              - "id_pregunta": ID único (ej. "hist_u1_001").
+              - "tipo": "seleccion_multiple", "verdadero_falso" o "unir_conceptos".
+              - "pregunta": El enunciado claro.
+              - "imagen_url": (Opcional) URL pública terminada en .jpg/.png o null.
+              - "opciones": (Solo múltiple y V/F) Arreglo de strings.
+              - "correcta": (Solo múltiple y V/F) El string exacto de la respuesta correcta.
+              - "pares": (Solo unir_conceptos) Arreglo de objetos con "izq" y "der".</div>
           </div>
         </div>
 
@@ -105,11 +111,14 @@ Devuelve ÚNICAMENTE un arreglo JSON válido. Cada pregunta debe tener:
             <span class="admin-card-titulo">📥 Alimentar Almacén (JSON)</span>
             <div style="display:flex; gap:0.5rem; flex-wrap:wrap;">
               <button class="btn-eval-delete" onclick="window.open('https://chatgpt.com', '_blank')"
-                style="color:#10b981;border-color:rgba(16, 185, 129, 0.3);background:rgba(16, 185, 129, 0.1);">🟩 ChatGPT</button>
+                style="color:#10b981;border-color:rgba(16, 185, 129, 0.3);background:rgba(16, 185, 129, 0.1);">🟩
+                ChatGPT</button>
               <button class="btn-eval-delete" onclick="window.open('https://gemini.google.com', '_blank')"
-                style="color:#8b5cf6;border-color:rgba(139, 92, 246, 0.3);background:rgba(139, 92, 246, 0.1);">✨ Gemini</button>
+                style="color:#8b5cf6;border-color:rgba(139, 92, 246, 0.3);background:rgba(139, 92, 246, 0.1);">✨
+                Gemini</button>
               <button class="btn-eval-delete" onclick="window.open('https://chat.deepseek.com', '_blank')"
-                style="color:#3b82f6;border-color:rgba(59, 130, 246, 0.3);background:rgba(59, 130, 246, 0.1);">🐳 DeepSeek</button>
+                style="color:#3b82f6;border-color:rgba(59, 130, 246, 0.3);background:rgba(59, 130, 246, 0.1);">🐳
+                DeepSeek</button>
             </div>
           </div>
 
@@ -202,11 +211,14 @@ Devuelve ÚNICAMENTE un arreglo JSON válido. Cada pregunta debe tener:
               style="display:flex; flex-direction:column; gap:0.5rem; color:var(--text-dim); font-size:0.85rem;">
               Selecciona Asignatura y Grado para ver las unidades disponibles.
             </div>
-            <div style="margin-top:1rem; padding-top:1rem; border-top:1px solid rgba(255,255,255,0.1); display:flex; justify-content:space-between; align-items:center;">
-              <span style="font-weight:700; color:var(--primary);">Total pool disponible: <span id="lblTotalPool">0</span> preguntas</span>
+            <div
+              style="margin-top:1rem; padding-top:1rem; border-top:1px solid rgba(255,255,255,0.1); display:flex; justify-content:space-between; align-items:center;">
+              <span style="font-weight:700; color:var(--primary);">Total pool disponible: <span
+                  id="lblTotalPool">0</span> preguntas</span>
               <div style="display:flex; align-items:center; gap:0.5rem;">
                 <label>Preguntas para el alumno:</label>
-                <input type="number" id="fPruebaCant" class="form-input" value="15" style="width:70px; text-align:center;">
+                <input type="number" id="fPruebaCant" class="form-input" value="15"
+                  style="width:70px; text-align:center;">
               </div>
             </div>
           </div>
@@ -226,7 +238,8 @@ Devuelve ÚNICAMENTE un arreglo JSON válido. Cada pregunta debe tener:
         </div>
 
         <div class="admin-card" style="margin-top:1.5rem">
-          <div class="admin-card-header"><span class="admin-card-titulo">🟢 Evaluaciones Activas Actualmente</span></div>
+          <div class="admin-card-header"><span class="admin-card-titulo">🟢 Evaluaciones Activas Actualmente</span>
+          </div>
           <div id="listaPruebasActivas" style="padding:1rem; display:flex; flex-direction:column; gap:1rem;">
             Cargando...
           </div>
@@ -246,7 +259,8 @@ Devuelve ÚNICAMENTE un arreglo JSON válido. Cada pregunta debe tener:
         style="position:absolute; right:1.5rem; top:1.5rem; background:rgba(239,68,68,0.1); border:1px solid rgba(239,68,68,0.3); color:#ef4444; width:30px; height:30px; border-radius:50%; cursor:pointer; font-weight:bold; display:flex; justify-content:center; align-items:center;">X</button>
 
       <div class="admin-card-header" style="border-bottom:1px solid rgba(255,255,255,0.1); padding-bottom:1rem;">
-        <span class="admin-card-titulo" id="lblEditorTitulo" style="color:var(--primary); font-size:1.2rem;">👁️ Previsualizador</span>
+        <span class="admin-card-titulo" id="lblEditorTitulo" style="color:var(--primary); font-size:1.2rem;">👁️
+          Previsualizador</span>
       </div>
 
       <div id="listaEditorPreguntas" style="padding:1.5rem; display:flex; flex-direction:column; gap:1.5rem;">
