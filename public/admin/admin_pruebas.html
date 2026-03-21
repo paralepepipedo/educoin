@@ -86,23 +86,74 @@
             <div id="promptText"
               style="font-family:monospace; font-size:0.75rem; color:var(--text-dim); white-space:pre-wrap; background:rgba(0,0,0,0.2); border-radius:6px; padding:1rem;">
               Actúa como un profesor experto en educación básica de Chile.
-              Necesito que generes una batería de [CANTIDAD] preguntas sobre la asignatura de [ASIGNATURA],
-              específicamente sobre la Unidad: [TEMA] para alumnos de [GRADO] Básico.
+
+              Te adjuntaré un PDF con la unidad de evaluación. Debes leer exhaustivamente el PDF completo y generar
+              preguntas basadas ESTRICTA Y EXCLUSIVAMENTE en ese documento.
+
+              Necesito que generes una batería de 50 preguntas sobre la asignatura de [ASIGNATURA], específicamente
+              sobre la Unidad: [TEMA] para alumnos de [GRADO] Básico.
 
               Las preguntas deben tener 3 formatos diferentes:
               1. Selección Múltiple (3 o 4 opciones).
               2. Verdadero o Falso.
               3. Unir Conceptos (3 pares lógicos por pregunta).
 
+              REGLAS ESTRICTAS DE CONTENIDO:
+              - Debes basarte únicamente en el contenido explícito del PDF adjunto.
+              - No uses conocimiento externo.
+              - No inventes información que no esté presente en el PDF.
+              - Si el PDF no contiene suficiente información para una pregunta, no inventes; formula otra usando solo
+              contenido real del documento.
+
+              REGLAS ESTRICTAS DE CANTIDAD:
+              - Debes generar SIEMPRE exactamente 50 preguntas.
+              - No generes 49 ni 51.
+              - Verifica antes de responder que el arreglo final tenga exactamente 50 objetos.
+
+              REGLAS ESTRICTAS DE IMÁGENES:
+              - "imagen_url" solo puede contener una URL real, pública y directa terminada en .jpg o .png.
+              - No inventes enlaces.
+              - Si no tienes certeza absoluta de una imagen real y válida, usa null en "imagen_url".
+              - No agregues ningún campo extra dentro del JSON.
+              - Las sugerencias de imágenes deben ir FUERA del JSON, al final, indicando el número de pregunta y la
+              sugerencia correspondiente.
+
               REGLAS ESTRICTAS DE FORMATO:
-              Devuelve ÚNICAMENTE un arreglo JSON válido. Cada pregunta debe tener:
+              Debes responder en 2 bloques y en este orden exacto:
+
+              BLOQUE 1:
+              Devuelve ÚNICAMENTE un arreglo JSON válido.
+              Cada pregunta debe tener exactamente esta estructura, sin agregar ni quitar campos:
               - "id_pregunta": ID único (ej. "hist_u1_001").
               - "tipo": "seleccion_multiple", "verdadero_falso" o "unir_conceptos".
               - "pregunta": El enunciado claro.
-              - "imagen_url": (Opcional) URL pública terminada en .jpg/.png o null.
+              - "imagen_url": URL pública terminada en .jpg/.png o null.
               - "opciones": (Solo múltiple y V/F) Arreglo de strings.
               - "correcta": (Solo múltiple y V/F) El string exacto de la respuesta correcta.
-              - "pares": (Solo unir_conceptos) Arreglo de objetos con "izq" y "der".</div>
+              - "pares": (Solo unir_conceptos) Arreglo de objetos con "izq" y "der".
+
+              BLOQUE 2:
+              Después del JSON, escribe exactamente este encabezado:
+              SUGERENCIAS_IMAGENES
+
+              Debajo de ese encabezado, lista solo las preguntas que deberían llevar imagen pero cuyo campo "imagen_url"
+              quedó en null.
+              Usa este formato exacto:
+              Pregunta 7: [sugerencia]
+              Pregunta 12: [sugerencia]
+              Pregunta 24: [sugerencia]
+
+              Si ninguna pregunta necesita sugerencia de imagen, escribe:
+              SUGERENCIAS_IMAGENES
+              Ninguna
+
+              IMPORTANTE:
+              - No agregues explicaciones.
+              - No agregues introducciones.
+              - No uses bloques markdown.
+              - No agregues texto entre el JSON y el encabezado SUGERENCIAS_IMAGENES.
+              - El JSON debe ser válido por sí solo y contener exactamente 50 preguntas.
+            </div>
           </div>
         </div>
 
