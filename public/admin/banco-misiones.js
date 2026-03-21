@@ -785,6 +785,13 @@ function onTriggerChange() {
   if (grupoAsig) grupoAsig.style.display =
     (trigger === 'tarea_subida' || trigger === 'evaluacion_marcada') ? 'block' : 'none';
 
+  // Evaluación IA específica
+  var grupoPruebaIa = document.getElementById('grupoPruebaIa');
+  if (grupoPruebaIa) {
+    grupoPruebaIa.style.display = trigger === 'prueba_ia_completada' ? 'block' : 'none';
+    if (trigger === 'prueba_ia_completada') cargarPruebasIaEnSelect();
+  }
+
   // Si no es juego, limpiar juego_id
   if (trigger !== 'juego_especifico' && trigger !== 'juego_completado') {
     var sel = document.getElementById('fJuegoId');
@@ -793,6 +800,36 @@ function onTriggerChange() {
 
   // Recalcular condición visible
   onCondicionChange();
+}
+
+function cargarPruebasIaEnSelect() {
+  var sel = document.getElementById('fPruebaIaId');
+  if (!sel) return;
+  sel.innerHTML = '<option value="">Cargando...</option>';
+
+  apiPost({ action: 'get_pruebas_activas' })
+    .then(function (data) {
+      var pruebas = (data.pruebas || []).filter(function (p) { return p.forzada && p.activa; });
+      if (pruebas.length === 0) {
+        sel.innerHTML = '<option value="">— Sin evaluaciones forzadas activas —</option>';
+        return;
+      }
+      sel.innerHTML = '<option value="">— Cualquier evaluación IA —</option>' +
+        pruebas.map(function (p) {
+          return '<option value="' + p.id + '">' + p.asignatura + ' · ' + p.nombre + ' (Grado ' + p.grado + '°)</option>';
+        }).join('');
+
+      sel.addEventListener('change', function () {
+        var urlField = document.getElementById('fUrl');
+        if (!urlField) return;
+        if (!this.value) { urlField.value = ''; return; }
+        var prueba = pruebas.find(function (p) { return p.id === sel.value; });
+        if (prueba) urlField.value = '../evaluaciones/preparacion.html?id=' + prueba.id;
+      });
+    })
+    .catch(function () {
+      sel.innerHTML = '<option value="">— Error al cargar —</option>';
+    });
 }
 
 function onCondicionChange() {

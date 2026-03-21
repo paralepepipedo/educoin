@@ -22,7 +22,8 @@ ACCESO:   Solo usuarios con rol 'admin'
   <link rel="stylesheet" href="../shared/shared.css" />
   <link rel="stylesheet" href="admin.css" />
   <script data-clerk-publishable-key="pk_test_bG92aW5nLXJhcHRvci0xLmNsZXJrLmFjY291bnRzLmRldiQ"
-    src="https://lovable-raptor-1.clerk.accounts.dev/npm/@clerk/clerk-js@latest/dist/clerk.browser.js" crossorigin="anonymous"></script>
+    src="https://lovable-raptor-1.clerk.accounts.dev/npm/@clerk/clerk-js@latest/dist/clerk.browser.js"
+    crossorigin="anonymous"></script>
 
   <style>
     /* =============================================
@@ -1151,6 +1152,7 @@ ACCESO:   Solo usuarios con rol 'admin'
             <option value="nota_ingresada">⭐ Registrar nota de prueba</option>
             <option value="duelo_ganado">⚔️ Ganar un duelo</option>
             <option value="login_diario">🔑 Iniciar sesión</option>
+            <option value="prueba_ia_completada">🤖 Completar evaluación IA</option>
             <option value="manual_profesor">👨‍🏫 El profesor la otorga</option>
           </select>
         </div>
@@ -1179,6 +1181,15 @@ ACCESO:   Solo usuarios con rol 'admin'
           <option value="HorseRace">🏇 Horse Race</option>
           <option value="mapaquiz">🗺️ Mapa Quiz</option>
           <option value="problemas">🧮 Problemas</option>
+        </select>
+      </div>
+
+      <!-- Evaluación IA específica — visible solo cuando trigger = prueba_ia_completada -->
+      <div class="form-group cond-field" id="grupoPruebaIa" style="display:none;">
+        <label class="form-label">Evaluación IA específica <span style="color:var(--text-muted);font-size:.72rem;">(solo
+            evaluaciones forzadas activas)</span></label>
+        <select class="form-select" id="fPruebaIaId">
+          <option value="">Cargando evaluaciones...</option>
         </select>
       </div>
 

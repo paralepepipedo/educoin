@@ -510,6 +510,7 @@ document.addEventListener('click', function (e) {
     localStorage.removeItem('educoins_perfil_v1');
     localStorage.removeItem('educoins_refuerzo_cache_v1');
     localStorage.removeItem('educoins_refuerzo_cache_v1_shown');
+    localStorage.removeItem('educoins_refuerzo_global_visto');
     document.cookie = 'clerk_active_context=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;';
     document.cookie = '__clerk_db_jwt=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;';
   } catch (e) { }
@@ -687,20 +688,23 @@ function initRefuerzoForzado(token) {
 }
 
 function filtrarPruebasPorIntervalo(pruebas) {
-  return pruebas.filter(function (p) {
-    var lsKey = 'educoins_refuerzo_visto_' + p.id;
-    var ultimoVisto = null;
-    try { ultimoVisto = localStorage.getItem(lsKey); } catch (e) { }
-    if (!ultimoVisto) return true;
-    return (Date.now() - new Date(ultimoVisto).getTime()) >= calcularIntervaloRefuerzo(p.ultima_nota);
-  });
+  try {
+    var global = localStorage.getItem('educoins_refuerzo_global_visto');
+    if (global) {
+      var g = JSON.parse(global);
+      if (g.expira && Date.now() < g.expira) return [];
+    }
+  } catch (e) { }
+  return pruebas;
 }
 
 function calcularIntervaloRefuerzo(ultimaNota) {
   if (ultimaNota === null || ultimaNota === undefined) return 0;
-  if (ultimaNota <= 2) return 30 * 60 * 1000;
-  if (ultimaNota >= 7) return 4 * 60 * 60 * 1000;
-  return 2 * 60 * 60 * 1000;
+  if (ultimaNota < 2) return 20 * 60 * 1000;   // < 2.0  → 20 min
+  if (ultimaNota < 5) return 40 * 60 * 1000;   // 2.0–4.9 → 40 min
+  if (ultimaNota < 6) return 60 * 60 * 1000;   // 5.0–5.9 → 60 min
+  if (ultimaNota < 7) return 2 * 60 * 60 * 1000; // 6.0–6.9 → 2 horas
+  return 4 * 60 * 60 * 1000;                    // ≥ 7.0  → 4 horas
 }
 
 function esperarHeaderYMostrar(pruebas) {
@@ -728,7 +732,9 @@ function renderRefuerzoModal(pruebas, overlay) {
   var menorIntervalo = Math.min.apply(null, pruebas.map(function (p) { return calcularIntervaloRefuerzo(p.ultima_nota); }));
   if (pieHint) {
     if (menorIntervalo === 0) pieHint.textContent = 'Primera vez — los resultados quedarán guardados';
-    else if (menorIntervalo <= 30 * 60 * 1000) pieHint.textContent = 'Volverá en 30 minutos si no lo intentas';
+    else if (menorIntervalo <= 20 * 60 * 1000) pieHint.textContent = 'Volverá en 20 minutos si no lo intentas';
+    else if (menorIntervalo <= 40 * 60 * 1000) pieHint.textContent = 'Volverá en 40 minutos';
+    else if (menorIntervalo <= 60 * 60 * 1000) pieHint.textContent = 'Volverá en 1 hora';
     else if (menorIntervalo <= 2 * 60 * 60 * 1000) pieHint.textContent = 'Volverá en 2 horas';
     else pieHint.textContent = 'Volverá en 4 horas';
   }

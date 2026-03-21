@@ -543,6 +543,18 @@ function abrirDetalle(evalId) {
   }
 
   // Botones de acción
+  var secIa = document.getElementById('detallePruebasIa');
+  if (!secIa) {
+    var divIa = document.createElement('div');
+    divIa.innerHTML =
+      '<div style="margin-top:1rem;border-top:1px solid var(--border);padding-top:1rem;">' +
+      '<div style="font-family:\'Press Start 2P\',monospace;font-size:.35rem;color:var(--text-muted);margin-bottom:.6rem;">🤖 PRACTICA CON IA</div>' +
+      '<div id="detallePruebasIa"></div>' +
+      '</div>';
+    document.getElementById('detalleAcciones').before(divIa);
+  }
+  cargarPruebasForzadasAsig(e.asignatura);
+
   construirBotonesDetalle(e);
   abrirModal('modalDetalle');
 }
@@ -1004,9 +1016,12 @@ function evalsDia(fechaStr) {
 }
 
 function evalsMes() {
+  var hoy = new Date(); hoy.setHours(0, 0, 0, 0);
   return STATE.evaluaciones.filter(function (e) {
     var f = new Date(e.fecha_evaluacion + 'T00:00:00');
     return f.getMonth() === STATE.mes && f.getFullYear() === STATE.anio &&
+      f >= hoy &&
+      e.estado !== 'nota_ingresada' &&
       (!STATE.filtro || e.asignatura === STATE.filtro);
   });
 }
@@ -1060,7 +1075,48 @@ function toast(msg, tipo) {
 }
 
 // ============================================
-// 24. ALERTAS AUTOMÁTICAS
+// 24. EVALUACIONES IA — sección en modal detalle
+// ============================================
+function cargarPruebasForzadasAsig(asignatura) {
+  var cont = document.getElementById('detallePruebasIa');
+  if (!cont) return;
+  cont.innerHTML = '<div style="color:var(--text-muted);font-size:.75rem;padding:.5rem 0;">Cargando...</div>';
+
+  fetch(BASE_URL + '/api/pruebas', {
+    method: 'POST',
+    credentials: 'include',
+    headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + window.CLERK_TOKEN },
+    body: JSON.stringify({ action: 'get_pruebas_forzadas' })
+  })
+    .then(function (r) { return r.ok ? r.json() : null; })
+    .then(function (data) {
+      if (!data || !data.pruebas) { cont.innerHTML = ''; return; }
+      var filtradas = data.pruebas.filter(function (p) { return p.asignatura === asignatura; });
+      if (filtradas.length === 0) { cont.innerHTML = '<div style="color:var(--text-muted);font-size:.75rem;padding:.5rem 0;">Sin evaluaciones IA activas para esta asignatura.</div>'; return; }
+
+      var html = '';
+      filtradas.forEach(function (p) {
+        var tieneNota = p.ultima_nota !== null && p.ultima_nota !== undefined;
+        var colorNota = !tieneNota ? 'var(--text-dim)' : p.ultima_nota >= 5.5 ? '#22c55e' : p.ultima_nota >= 4.0 ? '#f97316' : '#ef4444';
+        var notaTexto = tieneNota ? String(p.ultima_nota).replace('.', ',') : '—';
+        var notaLbl = tieneNota ? 'última nota' : 'sin intentos';
+        var url = BASE_URL + '/evaluaciones/preparacion.html?id=' + p.id;
+        html +=
+          '<div style="display:flex;align-items:center;gap:.75rem;padding:.6rem .75rem;background:rgba(0,0,0,0.2);border:1px solid var(--border);border-radius:8px;margin-bottom:.4rem;">' +
+          '<div style="flex:1;min-width:0;">' +
+          '<div style="font-size:.82rem;font-weight:800;color:var(--text);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">' + p.nombre + '</div>' +
+          '<div style="font-size:.7rem;color:var(--text-muted);font-weight:700;margin-top:2px;">' + notaLbl + (tieneNota ? ': <span style="color:' + colorNota + ';font-weight:900;">' + notaTexto + '</span>' : '') + '</div>' +
+          '</div>' +
+          '<a href="' + url + '" style="font-size:.7rem;font-weight:900;padding:.25rem .6rem;border-radius:6px;background:rgba(34,197,94,.12);color:#22c55e;border:1px solid rgba(34,197,94,.3);text-decoration:none;white-space:nowrap;flex-shrink:0;">🎯 Practicar</a>' +
+          '</div>';
+      });
+      cont.innerHTML = html;
+    })
+    .catch(function () { cont.innerHTML = ''; });
+}
+
+// ============================================
+// 25. ALERTAS AUTOMÁTICAS
 // ============================================
 function verificarAlertas() {
   var urgentes = STATE.evaluaciones.filter(function (e) {

@@ -595,7 +595,11 @@
         </div>
       </section>
       <section class="section fade-up delay-4">
-        <div class="section-title">🤖 EVALUACIONES IA</div>
+        <div class="section-title" style="display:flex;align-items:center;gap:1rem;flex-wrap:wrap;">
+          🤖 EVALUACIONES IA
+          <span id="refuerzoCuentaRegresiva"
+            style="font-family:'Nunito',sans-serif;font-size:.7rem;font-weight:800;padding:.2rem .6rem;border-radius:6px;background:rgba(99,102,241,.12);color:#818cf8;border:1px solid rgba(99,102,241,.25);display:none;"></span>
+        </div>
         <div id="evalIaContenido">
           <div class="empty-state"
             style="background:var(--card);border:1px solid var(--border);border-radius:var(--radius);padding:2rem;">
@@ -768,6 +772,30 @@
     }
     function statBox(n, l, c) { return '<div class="stat-box"><span class="stat-num" style="color:' + c + '">' + n + '</span><span class="stat-label">' + l + '</span></div>'; }
     window.addEventListener('resize', function () { if (STATE.juegos) { renderGraficoMonedas(); renderGraficoJuegos(); } });
+
+    (function initCuentaRegresiva() {
+      var el = document.getElementById('refuerzoCuentaRegresiva');
+      if (!el) return;
+      function tick() {
+        try {
+          var raw = localStorage.getItem('educoins_refuerzo_global_visto');
+          if (!raw) { el.style.display = 'none'; return; }
+          var g = JSON.parse(raw);
+          var restante = g.expira - Date.now();
+          if (restante <= 0) { el.style.display = 'none'; return; }
+          var h = Math.floor(restante / 3600000);
+          var m = Math.floor((restante % 3600000) / 60000);
+          var s = Math.floor((restante % 60000) / 1000);
+          el.textContent = '⏱ Próximo refuerzo en ' +
+            (h > 0 ? String(h).padStart(2, '0') + ':' : '') +
+            String(m).padStart(2, '0') + ':' +
+            String(s).padStart(2, '0');
+          el.style.display = 'inline-block';
+        } catch (e) { el.style.display = 'none'; }
+      }
+      tick();
+      setInterval(tick, 1000);
+    })();
   </script>
 </body>
 

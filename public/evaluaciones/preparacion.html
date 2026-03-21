@@ -1467,6 +1467,13 @@
           const res = await apiPost({ action: 'registrar_intento', prueba_id: pruebaId, respuestas: respuestasAlumno });
           // Limpiar caché del modal de refuerzo para que la próxima vez consulte datos frescos
           try { localStorage.removeItem('educoins_refuerzo_cache_v1'); } catch (e) { }
+          try {
+            var _pct = res.resultado.precision_pct;
+            var _nota = _pct >= 60 ? 4.0 + ((_pct - 60) / 40) * 3.0 : 1.0 + (_pct / 60) * 3.0;
+            _nota = Math.round(_nota * 10) / 10;
+            var _intervalo = _nota < 2 ? 20 : _nota < 5 ? 40 : _nota < 6 ? 60 : _nota < 7 ? 120 : 240;
+            localStorage.setItem('educoins_refuerzo_global_visto', JSON.stringify({ ts: Date.now(), expira: Date.now() + _intervalo * 60 * 1000 }));
+          } catch (e) { }
           ocultarLoading();
           mostrarResultado(res.resultado);
         } catch (e) {
