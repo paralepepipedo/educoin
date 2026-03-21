@@ -978,8 +978,55 @@
         font-size: 56px;
       }
 
+      #headerFlotante {
+        flex-wrap: wrap;
+        padding: 8px 12px 6px;
+        gap: 6px;
+      }
+
+      #btnVolver {
+        order: 1;
+        flex-shrink: 0;
+      }
+
+      #headerInfo {
+        order: 2;
+        flex: 1;
+        min-width: 0;
+      }
+
+      #timerDisplay {
+        order: 3;
+        flex-shrink: 0;
+        font-size: 11px;
+        padding: 3px 7px;
+      }
+
+      #btnEntregar {
+        order: 4;
+        flex-shrink: 0;
+        font-size: 10px;
+        padding: 4px 10px;
+      }
+
       #dotsContainer {
-        max-width: 180px;
+        order: 5;
+        width: 100%;
+        max-width: 100%;
+        flex-wrap: nowrap;
+        overflow-x: auto;
+        overflow-y: hidden;
+        justify-content: flex-start;
+        padding-bottom: 2px;
+        scrollbar-width: none;
+      }
+
+      #dotsContainer::-webkit-scrollbar {
+        display: none;
+      }
+
+      #screenPrueba {
+        padding-top: 80px;
       }
     }
   </style>
