@@ -438,6 +438,11 @@
     </div>
   </div>
 
+  <script data-clerk-publishable-key="pk_test_bG92aW5nLXJhcHRvci0xLmNsZXJrLmFjY291bnRzLmRldiQ"
+    src="https://lovable-raptor-1.clerk.accounts.dev/npm/@clerk/clerk-js@latest/dist/clerk.browser.js"
+    crossorigin="anonymous"></script>
+  <script src="../../auth/clerk-config.js"></script>
+  <script src="../../shared/clerk-guard.js"></script>
   <script src="../../shared/shared.js"></script>
   <script>
     // Pool de 30 imágenes del 1.jpg al 30.jpg
@@ -675,7 +680,7 @@
           fetch('/api/juegos', {
             method: 'POST',
             headers: { 'Authorization': 'Bearer ' + _tok, 'Content-Type': 'application/json' },
-            body: JSON.stringify({ action: 'completar', juego_id: _jid, puntos: recompensa, duracion_seg: STATE.timerSeg, session_id: _sid })
+            body: JSON.stringify({ action: 'completar', juego_id: _jid || 'memoria', puntos: recompensa, duracion_seg: STATE.timerSeg, session_id: _sid })
           }).then(function (r) { return r.json(); }).then(function (data) {
             if (!data.ok) return;
             toast('+' + data.monedas_ganadas + ' EduCoins y +' + data.xp_ganado + ' XP 🎉', 'coins');
