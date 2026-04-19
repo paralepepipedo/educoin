@@ -1,0 +1,1508 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>🐶 Dividamos con Rufo</title>
+  <link href="https://fonts.googleapis.com/css2?family=Fredoka+One&family=Nunito:wght@400;600;700;800&display=swap"
+    rel="stylesheet">
+  <style>
+    :root {
+      --bg: #fef9f0;
+      --primary: #ff7043;
+      --primary-light: #ffccbc;
+      --secondary: #42a5f5;
+      --secondary-light: #bbdefb;
+      --green: #66bb6a;
+      --green-light: #c8e6c9;
+      --yellow: #ffca28;
+      --yellow-light: #fff9c4;
+      --purple: #ab47bc;
+      --purple-light: #e1bee7;
+      --card: #ffffff;
+      --text: #3d2b1f;
+      --text-soft: #7b5e52;
+      --radius: 20px;
+      --shadow: 0 6px 24px rgba(0, 0, 0, 0.10);
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      font-family: 'Nunito', sans-serif;
+      background: var(--bg);
+      background-image:
+        radial-gradient(circle at 15% 20%, #ffd54f33 0%, transparent 40%),
+        radial-gradient(circle at 85% 80%, #80deea33 0%, transparent 40%);
+      min-height: 100vh;
+      color: var(--text);
+      padding: 16px;
+    }
+
+    h1 {
+      font-family: 'Fredoka One', cursive;
+      font-size: 2rem;
+      color: var(--primary);
+      text-align: center;
+      text-shadow: 3px 3px 0 #ffccbc;
+      margin-bottom: 4px;
+    }
+
+    .subtitle {
+      text-align: center;
+      color: var(--text-soft);
+      font-weight: 700;
+      margin-bottom: 16px;
+    }
+
+    .layout {
+      display: grid;
+      grid-template-columns: 1fr 200px;
+      gap: 16px;
+      max-width: 960px;
+      margin: 0 auto;
+    }
+
+    .main-col {
+      display: flex;
+      flex-direction: column;
+      gap: 14px;
+    }
+
+    .card {
+      background: var(--card);
+      border-radius: var(--radius);
+      padding: 18px 22px;
+      box-shadow: var(--shadow);
+      border: 2.5px solid transparent;
+    }
+
+    .card.orange {
+      border-color: var(--primary-light);
+    }
+
+    .card.blue {
+      border-color: var(--secondary-light);
+    }
+
+    .card.green {
+      border-color: var(--green-light);
+    }
+
+    .card.purple {
+      border-color: var(--purple-light);
+    }
+
+    .card.yellow {
+      border-color: var(--yellow);
+    }
+
+    .card-title {
+      font-family: 'Fredoka One', cursive;
+      font-size: 1.1rem;
+      margin-bottom: 10px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .rufo-bubble {
+      display: flex;
+      gap: 12px;
+      align-items: flex-start;
+    }
+
+    .rufo-face {
+      font-size: 2.6rem;
+      flex-shrink: 0;
+      animation: wag 2s ease-in-out infinite;
+      transform-origin: bottom center;
+    }
+
+    @keyframes wag {
+
+      0%,
+      100% {
+        transform: rotate(-5deg)
+      }
+
+      50% {
+        transform: rotate(5deg)
+      }
+    }
+
+    .speech-bubble {
+      background: var(--yellow-light);
+      border: 2.5px solid var(--yellow);
+      border-radius: 16px 16px 16px 4px;
+      padding: 10px 14px;
+      font-size: .95rem;
+      font-weight: 700;
+      line-height: 1.5;
+      flex: 1;
+    }
+
+    input[type=number] {
+      width: 80px;
+      padding: 8px 10px;
+      font-family: 'Fredoka One', cursive;
+      font-size: 1.4rem;
+      border: 3px solid var(--primary-light);
+      border-radius: 12px;
+      text-align: center;
+      color: var(--primary);
+      outline: none;
+      background: #fff8f5;
+      transition: border-color .2s;
+    }
+
+    input[type=number]:focus {
+      border-color: var(--primary);
+    }
+
+    input[type=number].ok {
+      border-color: var(--green);
+      background: #f1f8f1;
+    }
+
+    input[type=number].error {
+      border-color: #e53935;
+      background: #ffebee;
+    }
+
+    input[type=number].small {
+      width: 70px;
+      font-size: 1.2rem;
+    }
+
+    .btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      padding: 10px 20px;
+      border: none;
+      border-radius: 50px;
+      font-family: 'Fredoka One', cursive;
+      font-size: 1rem;
+      cursor: pointer;
+      transition: transform .15s, box-shadow .15s;
+      box-shadow: 0 4px 0 rgba(0, 0, 0, 0.15);
+    }
+
+    .btn:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 6px 0 rgba(0, 0, 0, 0.15);
+    }
+
+    .btn:active {
+      transform: translateY(2px);
+      box-shadow: 0 2px 0 rgba(0, 0, 0, 0.15);
+    }
+
+    .btn-primary {
+      background: var(--primary);
+      color: white;
+    }
+
+    .btn-green {
+      background: var(--green);
+      color: white;
+    }
+
+    .btn-blue {
+      background: var(--secondary);
+      color: white;
+    }
+
+    .btn-purple {
+      background: var(--purple);
+      color: white;
+    }
+
+    .btn-yes {
+      background: var(--green);
+      color: white;
+    }
+
+    .btn-no {
+      background: #ef5350;
+      color: white;
+    }
+
+    .input-row {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      flex-wrap: wrap;
+      margin-top: 12px;
+    }
+
+    .num-label {
+      font-family: 'Fredoka One', cursive;
+      font-size: 1rem;
+      color: var(--text-soft);
+    }
+
+    .feedback {
+      padding: 8px 14px;
+      border-radius: 12px;
+      font-weight: 700;
+      font-size: .9rem;
+      margin-top: 8px;
+      display: none;
+    }
+
+    .feedback.show {
+      display: block;
+    }
+
+    .feedback.ok {
+      background: var(--green-light);
+      color: #2e7d32;
+      border: 2px solid var(--green);
+    }
+
+    .feedback.err {
+      background: #ffebee;
+      color: #c62828;
+      border: 2px solid #ef9a9a;
+    }
+
+    /* ===== CASITA ===== */
+    .casita-container {
+      font-family: 'Courier New', monospace;
+      font-size: 1.5rem;
+      font-weight: 700;
+      background: #fffde7;
+      border: 2px dashed #fdd835;
+      border-radius: 14px;
+      padding: 14px 20px;
+      min-height: 80px;
+      line-height: 2;
+      margin: 10px 0;
+      display: inline-flex;
+      /* ← cambiar inline-block por inline-flex */
+      flex-direction: column;
+      /* ← agregar */
+      align-items: flex-end;
+      /* ← agregar */
+      min-width: 140px;
+    }
+
+    .casita-wrap {
+      text-align: left;
+    }
+
+    .casita-row {
+      display: flex;
+      justify-content: flex-end;
+      align-items: center;
+      position: relative;
+      min-height: 2rem;
+    }
+
+    .casita-row.resta-line {
+      border-top: 2.5px solid #555;
+      margin-top: 2px;
+    }
+
+    .casita-num {
+      text-align: right;
+      padding-right: 2px;
+    }
+
+    .casita-op {
+      width: 24px;
+      text-align: left;
+      color: #555;
+      font-size: 1.3rem;
+    }
+
+    .casita-dividend {
+      color: var(--text);
+    }
+
+    .casita-product {
+      color: var(--secondary);
+    }
+
+    .casita-remain {
+      color: var(--green);
+    }
+
+    .casita-bajando {
+      color: var(--primary);
+      font-weight: 900;
+    }
+
+    .hl-digit {
+      background: #ffe082;
+      border-radius: 4px;
+      padding: 0 3px;
+      color: var(--primary);
+      border-bottom: 3px solid var(--primary);
+    }
+
+    .baja-digit {
+      color: var(--primary);
+      font-size: 1.6rem;
+      animation: baja-anim 0.7s ease-out forwards;
+      display: inline-block;
+    }
+
+    @keyframes baja-anim {
+      0% {
+        opacity: 0;
+        transform: translateY(-18px) scale(1.3);
+      }
+
+      60% {
+        opacity: 1;
+        transform: translateY(4px) scale(1.1);
+      }
+
+      100% {
+        opacity: 1;
+        transform: translateY(0) scale(1);
+      }
+    }
+
+    /* ===== HISTORIAL DE PASOS ===== */
+    .historial-wrap {
+      margin-top: 14px;
+    }
+
+    .historial-title {
+      font-family: 'Fredoka One', cursive;
+      font-size: .9rem;
+      color: var(--text-soft);
+      margin-bottom: 6px;
+    }
+
+    .historial-container {
+      font-family: 'Courier New', monospace;
+      font-size: 1.3rem;
+      font-weight: 700;
+      background: #f9fbe7;
+      border: 2px solid #dce775;
+      border-radius: 14px;
+      padding: 12px 18px;
+      display: inline-block;
+      min-width: 140px;
+      line-height: 2;
+    }
+
+    .hist-row {
+      display: flex;
+      justify-content: flex-end;
+      align-items: center;
+      min-height: 1.8rem;
+    }
+
+    .hist-row.line {
+      border-top: 2px solid #aaa;
+      margin-top: 2px;
+    }
+
+    .hist-op {
+      width: 22px;
+      color: #888;
+    }
+
+    .hist-num {
+      min-width: 70px;
+      text-align: right;
+    }
+
+    .hist-dividend {
+      color: var(--text);
+    }
+
+    .hist-product {
+      color: var(--secondary);
+    }
+
+    .hist-remain {
+      color: var(--green);
+      font-weight: 900;
+    }
+
+    .hist-bajando {
+      color: var(--primary);
+      font-weight: 900;
+    }
+
+    .hist-coc {
+      color: var(--purple);
+    }
+
+    @keyframes flash-in {
+      0% {
+        background: #ffe082;
+        border-radius: 6px;
+      }
+
+      100% {
+        background: transparent;
+      }
+    }
+
+    .flash {
+      animation: flash-in 1.2s ease-out forwards;
+    }
+
+    @keyframes drop-in {
+      0% {
+        opacity: 0;
+        transform: translateY(-10px);
+      }
+
+      100% {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+
+    .drop {
+      animation: drop-in .45s ease-out forwards;
+    }
+
+    /* ===== MULTIPLICACIÓN COMPROBACIÓN ===== */
+    .mult-visual {
+      font-family: 'Courier New', monospace;
+      font-size: 1.6rem;
+      font-weight: 700;
+      background: #f3e5f5;
+      border: 2px dashed var(--purple);
+      border-radius: 14px;
+      padding: 14px 20px;
+      display: inline-block;
+      min-width: 140px;
+      line-height: 2.2;
+      margin: 8px 0;
+    }
+
+    .mult-row {
+      display: flex;
+      justify-content: flex-end;
+      align-items: baseline;
+      min-height: 2rem;
+      gap: 2px;
+    }
+
+    .mult-row.line {
+      border-top: 2.5px solid #555;
+      margin-top: 2px;
+    }
+
+    .mult-digits-wrap {
+      display: inline-flex;
+      align-items: flex-end;
+      gap: 0;
+    }
+
+    .mult-digit-col {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      min-width: 1.1rem;
+    }
+
+    .mult-digit-reserva {
+      font-size: 0.75rem;
+      color: var(--primary);
+      font-weight: 900;
+      min-height: 1rem;
+      line-height: 1;
+    }
+
+    .mult-digit-num {
+      font-size: 1.6rem;
+      font-weight: 700;
+      line-height: 1.2;
+    }
+
+    .mult-result {
+      color: var(--purple);
+    }
+
+    /* TABLA PITAGÓRICA */
+    .tabla-wrap {
+      background: var(--card);
+      border-radius: var(--radius);
+      padding: 12px 8px;
+      box-shadow: var(--shadow);
+      border: 2.5px solid var(--purple-light);
+      overflow-x: auto;
+    }
+
+    .tabla-title {
+      font-family: 'Fredoka One', cursive;
+      font-size: .95rem;
+      color: var(--purple);
+      text-align: center;
+      margin-bottom: 6px;
+    }
+
+    table.pita {
+      border-collapse: separate;
+      border-spacing: 2px;
+      font-size: .75rem;
+      font-weight: 700;
+      width: 100%;
+    }
+
+    table.pita td {
+      width: 19px;
+      height: 19px;
+      text-align: center;
+      border-radius: 4px;
+      background: #f5f5f5;
+      transition: background .3s, transform .2s;
+    }
+
+    table.pita td.hdr {
+      background: var(--purple-light);
+      color: var(--purple);
+      font-family: 'Fredoka One', cursive;
+    }
+
+    table.pita td.row-hl {
+      background: #fff9c4;
+    }
+
+    table.pita td.near-hl {
+      background: #ffb74d;
+      color: white;
+      transform: scale(1.08);
+    }
+
+    table.pita td.exact-hl {
+      background: var(--green);
+      color: white;
+      transform: scale(1.15);
+      box-shadow: 0 2px 6px rgba(102, 187, 106, .5);
+    }
+
+    .recta-wrap {
+      background: var(--card);
+      border-radius: var(--radius);
+      padding: 14px;
+      box-shadow: var(--shadow);
+      border: 2.5px solid var(--secondary-light);
+      overflow-x: auto;
+    }
+
+    .step-section {
+      display: none;
+    }
+
+    .step-section.active {
+      display: block;
+    }
+
+    .confetti-piece {
+      position: fixed;
+      width: 10px;
+      height: 10px;
+      border-radius: 2px;
+      animation: confetti-fall linear forwards;
+      pointer-events: none;
+      z-index: 9999;
+    }
+
+    @keyframes confetti-fall {
+      0% {
+        transform: translateY(-20px) rotate(0deg);
+        opacity: 1;
+      }
+
+      100% {
+        transform: translateY(110vh) rotate(720deg);
+        opacity: 0;
+      }
+    }
+
+    .res-panel {
+      font-family: 'Fredoka One', cursive;
+      font-size: 1rem;
+      color: var(--text);
+    }
+
+    @media(max-width:680px) {
+      .layout {
+        grid-template-columns: 1fr;
+      }
+    }
+  </style>
+</head>
+
+<body>
+
+  <h1>🐶 ¡Dividamos con Rufo!</h1>
+  <p class="subtitle">Tu compañero peludo para aprender divisiones 🦴</p>
+
+  <div class="layout">
+    <div class="main-col">
+
+      <!-- PASO 0: Ingresar división -->
+      <div class="card orange step-section active" id="s0">
+        <div class="card-title" style="color:var(--primary)">📝 Ingresa tu división</div>
+        <div class="rufo-bubble">
+          <div class="rufo-face">🐶</div>
+          <div class="speech-bubble">¡Hola! Soy Rufo 🐾 Escribe la división y ¡empezamos juntos!</div>
+        </div>
+        <div class="input-row">
+          <span class="num-label">Dividendo</span>
+          <input type="number" id="i-div" min="1" max="9999" placeholder="120">
+          <span class="num-label" style="font-size:1.5rem">÷</span>
+          <input type="number" id="i-sor" min="1" max="9" placeholder="8">
+        </div>
+        <div style="margin-top:14px">
+          <button class="btn btn-primary" onclick="iniciar()">🚀 ¡Empezar!</button>
+        </div>
+        <div id="err0" class="feedback err"></div>
+      </div>
+
+      <!-- PASO 1: Resolver división -->
+      <div class="card blue step-section" id="s1">
+        <div class="card-title" style="color:var(--secondary)">🔢 Resolviendo: <span id="lbl-div"
+            style="color:var(--primary)"></span></div>
+
+        <!-- Casita activa (paso actual) -->
+        <div class="casita-wrap">
+          <div class="casita-container" id="casita"></div>
+        </div>
+
+        <div class="rufo-bubble" style="margin-top:10px">
+          <div class="rufo-face">🐶</div>
+          <div class="speech-bubble" id="msg1">...</div>
+        </div>
+
+        <div class="input-row" id="area1">
+          <input type="number" class="small" id="inp1" min="0" max="99" placeholder="?">
+          <button class="btn btn-green" onclick="verificar()">✅ Verificar</button>
+        </div>
+        <div id="fb1" class="feedback"></div>
+        <button class="btn btn-primary" id="btn-bajar" style="display:none; margin-top:10px;"
+          onclick="ejecutarBajada()">
+          ⬇️ Bajar el dígito
+        </button>
+
+        <!-- Historial acumulado de pasos -->
+        <div class="historial-wrap" id="historial-wrap" style="display:none">
+          <div class="historial-title">📋 Lo que llevamos hecho:</div>
+          <div class="historial-container" id="historial"></div>
+        </div>
+      </div>
+
+      <!-- PASO 2: ¿Tiene residuo? -->
+      <div class="card green step-section" id="s2">
+        <div class="card-title" style="color:var(--green)">🤔 ¿Tiene residuo?</div>
+        <div class="rufo-bubble">
+          <div class="rufo-face">🐶</div>
+          <div class="speech-bubble" id="msg2">...</div>
+        </div>
+        <!-- Operación completa visible antes de responder -->
+        <div class="historial-wrap" style="margin-top:12px">
+          <div class="historial-title">📋 Aquí está la operación completa:</div>
+          <div class="historial-container" id="resumen-division"></div>
+        </div>
+        <div style="margin-top:14px; display:flex; gap:10px;">
+          <button class="btn btn-yes" onclick="respResiduo(true)">✅ SÍ</button>
+          <button class="btn btn-no" onclick="respResiduo(false)">❌ NO</button>
+        </div>
+        <div id="fb2" class="feedback"></div>
+      </div>
+
+      <!-- PASO 3: Comprobación multiplicación -->
+      <div class="card purple step-section" id="s3">
+        <div class="card-title" style="color:var(--purple)">🧮 ¡Comprobemos multiplicando!</div>
+        <div class="rufo-bubble">
+          <div class="rufo-face">🐶</div>
+          <div class="speech-bubble" id="msg3">...</div>
+        </div>
+        <div class="mult-visual" id="mult-vis"></div>
+        <div class="input-row" id="area3">
+          <input type="number" class="small" id="inp3" min="0" max="9999" placeholder="?">
+          <button class="btn btn-purple" onclick="verificarMult()">✅ Verificar</button>
+        </div>
+        <div id="fb3" class="feedback"></div>
+      </div>
+
+      <!-- PASO 4: Recta numérica -->
+      <div class="card yellow step-section" id="s4">
+        <div class="card-title" style="color:#f57f17">📏 Recta numérica</div>
+        <div class="rufo-bubble">
+          <div class="rufo-face">🐶</div>
+          <div class="speech-bubble" id="msg4">...</div>
+        </div>
+        <div class="recta-wrap" style="margin-top:12px">
+          <svg id="recta-svg" width="580" height="110" viewBox="0 0 580 110" style="max-width:100%"></svg>
+        </div>
+        <div style="margin-top:12px">
+          <button class="btn btn-primary" onclick="reiniciar()">🔄 ¡Otra división!</button>
+        </div>
+      </div>
+
+    </div><!-- /.main-col -->
+
+    <!-- COLUMNA DERECHA -->
+    <div style="display:flex;flex-direction:column;gap:14px;">
+      <div class="tabla-wrap">
+        <div class="tabla-title">📊 Tabla del <span id="lbl-tabla">?</span></div>
+        <table class="pita" id="tabla"></table>
+        <p style="font-size:.7rem;color:var(--text-soft);margin-top:6px;font-weight:700;">🟡 fila del divisor &nbsp; 🟠
+          se acerca &nbsp; 🟢 exacto</p>
+      </div>
+      <div class="card" style="border-color:var(--green-light);padding:12px">
+        <div style="font-family:'Fredoka One',cursive;color:var(--green);font-size:.9rem;margin-bottom:6px">📌 Resultado
+        </div>
+        <div class="res-panel" id="res-panel">—</div>
+      </div>
+    </div>
+
+  </div><!-- /.layout -->
+  <script>
+    let DVD, DVS, dStr;
+    let steps = [];
+    let curStep = 0;
+    let subStep = 0;
+    let remainder = 0;
+    let quotientArr = [];
+    let historialRows = [];
+
+    let multStep = 0;
+    let multReserva = 0;
+    let multPartials = [];
+    let multInnerStep = 0;
+    let multProdActual = 0;
+
+    function iniciar() {
+      const d = parseInt(document.getElementById('i-div').value);
+      const v = parseInt(document.getElementById('i-sor').value);
+      const err = document.getElementById('err0');
+      if (!d || !v || d < 1 || v < 1) { showErr(err, '⚠️ Ingresa números válidos.'); return; }
+      if (d > 9999) { showErr(err, '⚠️ Dividendo máximo 9999 por ahora.'); return; }
+      if (v > 9) { showErr(err, '⚠️ El divisor debe ser un solo dígito (1-9).'); return; }
+      err.classList.remove('show');
+
+      DVD = d; DVS = v; dStr = String(d);
+      steps = []; quotientArr = []; curStep = 0; subStep = 0; remainder = 0;
+      historialRows = [];
+      multStep = 0; multReserva = 0; multPartials = []; multInnerStep = 0; multProdActual = 0;
+
+      calcPasos();
+      buildTabla(v);
+      document.getElementById('lbl-div').textContent = d + " ÷ " + v;
+      document.getElementById('lbl-tabla').textContent = v;
+      show('s1'); hide('s0');
+      renderCasita();
+      preguntarPaso();
+      updateResPanel();
+    }
+
+    function calcPasos() {
+      let cur = 0;
+      for (let i = 0; i < dStr.length; i++) {
+        cur = cur * 10 + parseInt(dStr[i]);
+        const q = Math.floor(cur / DVS);
+        const prod = q * DVS;
+        const rem = cur - prod;
+        steps.push({ partial: cur, q, prod, rem, digitIdx: i });
+        quotientArr.push(null);
+        cur = rem;
+      }
+      remainder = cur;
+    }
+
+    /* ---- CASITA (paso actual) ---- */
+    function renderCasita(showRem, sinBajada) {
+      const el = document.getElementById('casita');
+      let html = buildDividendoRow();
+
+      for (let i = 0; i <= curStep && i < steps.length; i++) {
+        const s = steps[i];
+        const q = quotientArr[i];
+        if (q === null) break;
+        //if (q === 0) continue; // si cociente es 0 no hay resta que mostrar
+
+        // --- Calcular espacios para alinear el producto bajo el parcial ---
+        const largoTotal = dStr.length;
+        const largoProd = String(s.prod).length;
+        const espaciosDer = largoTotal - s.digitIdx - 1;
+        const espaciosIzq = largoTotal - largoProd - espaciosDer - 1;
+        const padDer = '&nbsp;'.repeat(Math.max(0, espaciosDer));
+        const padIzq = '&nbsp;'.repeat(Math.max(0, espaciosIzq));
+        const largoLinea = String(s.partial).length + 1;
+
+        html += `<div class="casita-row">
+      <span class="casita-op">−</span>
+      <span class="casita-num casita-product">${padIzq}${s.prod}${padDer}</span>
+    </div>`;
+        html += `<div class="casita-row resta-line" style="width:${largoLinea}ch;margin-left:auto;"></div>`;
+
+        const esPasoActual = (i === curStep);
+        const esAnterior = (i < curStep);
+        const mostrarResto = esAnterior || (esPasoActual && showRem);
+
+        if (mostrarResto) {
+          if (s.rem === 0 && i === steps.length - 1) {
+            const padCero = '&nbsp;'.repeat(Math.max(0, espaciosDer));
+            html += `<div class="casita-row drop">
+      <span class="casita-op"></span>
+      <span class="casita-num casita-remain">0${padCero}</span>
+    </div>`;
+          } else if (i + 1 < dStr.length && !(esPasoActual && sinBajada)) {
+            // solo baja el dígito si NO estamos en modo sinBajada
+            const nextD = dStr[i + 1];
+            const padBajada = '&nbsp;'.repeat(Math.max(0, largoTotal - String(s.rem).length - 1 - (largoTotal - s.digitIdx - 2)));
+            html += `<div class="casita-row drop">
+      <span class="casita-op"></span>
+      <span class="casita-num casita-bajando">${padBajada}${s.rem}<span class="baja-digit">${nextD}</span></span>
+    </div>`;
+          } else {
+            const padRes = '&nbsp;'.repeat(Math.max(0, espaciosDer));
+            html += `<div class="casita-row drop">
+      <span class="casita-op"></span>
+      <span class="casita-num casita-remain">${s.rem}${padRes}</span>
+    </div>`;
+          }
+        }
+      }
+
+      el.innerHTML = html;
+    }
+    // ✅ REEMPLAZAR POR
+    function buildDividendoRow() {
+      if (curStep >= steps.length && quotientArr.every(q => q !== null)) {
+        return casRowHTML('', dStr, 'casita-dividend', false);
+      }
+
+      const s = steps[curStep];
+      let hiStart = 0;
+      let hiEnd = s.digitIdx;
+
+      // Si el parcial tiene más de un dígito, resaltar exactamente ese bloque
+      if (String(s.partial).length > 1) {
+        hiStart = hiEnd - String(s.partial).length + 1;
+      } else {
+        hiStart = hiEnd;
+      }
+
+      let dividendoHTML = '';
+      for (let i = 0; i < dStr.length; i++) {
+        if (i >= hiStart && i <= hiEnd) {
+          dividendoHTML += '<span class="hl-digit">' + dStr[i] + '</span>';
+        } else {
+          dividendoHTML += dStr[i];
+        }
+      }
+
+      return casRowHTML('', dividendoHTML, 'casita-dividend', false);
+    }
+
+    function casRow(op, num, cls, flash) {
+      return '<div class="casita-row' + (flash ? ' flash' : '') + '">' +
+        '<span class="casita-op">' + op + '</span>' +
+        '<span class="casita-num ' + cls + '">' + num + '</span></div>';
+    }
+    function casRowHTML(op, innerHtml, cls, flash) {
+      return '<div class="casita-row' + (flash ? ' flash' : '') + '">' +
+        '<span class="casita-op">' + op + '</span>' +
+        '<span class="casita-num ' + cls + '">' + innerHtml + '</span></div>';
+    }
+    function agregarAlHistorial(s, inclResto, inclBajada) {
+      const paso = {
+        texto: '¿Cuántas veces cabe ' + DVS + ' en ' + s.partial + '? → ' + s.q,
+        resta: s.q > 0 ? (s.partial + ' − ' + s.prod + ' = ' + s.rem) : null,
+        bajada: (inclBajada && s.rem > 0 && s.digitIdx + 1 < dStr.length)
+          ? '⬇️ Baja el ' + dStr[s.digitIdx + 1] + ' → queda ' + String(s.rem) + dStr[s.digitIdx + 1]
+          : null
+      };
+      historialRows.push(paso);
+      renderHistorial();
+    }
+    /* ---- HISTORIAL ACUMULADO ---- */
+    function renderHistorial() {
+      if (historialRows.length === 0) return;
+      const wrap = document.getElementById('historial-wrap');
+      const el = document.getElementById('historial');
+      wrap.style.display = 'block';
+      let html = '';
+      historialRows.forEach((r, i) => {
+        html += '<div class="hist-row" style="font-size:1rem;padding:2px 0;">' +
+          '<span class="hist-num" style="text-align:left;font-family:Nunito,sans-serif;font-size:.85rem;">' +
+          '<strong>Paso ' + (i + 1) + ':</strong> ' + r.texto + '</span></div>';
+        if (r.resta) {
+          html += '<div class="hist-row" style="padding-left:1rem;">' +
+            '<span class="hist-num hist-product" style="text-align:left;font-family:Nunito,sans-serif;font-size:.85rem;">↳ ' + r.resta + '</span></div>';
+        }
+        if (r.bajada) {
+          html += '<div class="hist-row" style="padding-left:1rem;">' +
+            '<span class="hist-num hist-bajando" style="text-align:left;font-family:Nunito,sans-serif;font-size:.85rem;">' + r.bajada + '</span></div>';
+        }
+      });
+      const q = getCuociente();
+      if (q) {
+        html += '<div class="hist-row" style="border-top:2px solid #aaa;margin-top:4px;padding-top:4px;">' +
+          '<span class="hist-num hist-coc" style="text-align:left;font-family:Nunito,sans-serif;font-size:.9rem;">✅ Cociente: <strong>' + q + '</strong>' +
+          (remainder > 0 ? ' | Residuo: <strong>' + remainder + '</strong>' : ' (exacta)') +
+          '</span></div>';
+      }
+      el.innerHTML = html;
+    }
+
+
+
+    function renderResumenDivision() {
+      const el = document.getElementById('resumen-division');
+      const q = getCuociente();
+      let html = '<div class="hist-row"><span class="hist-op"></span>' +
+        '<span class="hist-num hist-coc">' + DVD + ' ÷ ' + DVS + ' = ' + q +
+        (remainder > 0 ? ' (r:' + remainder + ')' : '') + '</span></div>';
+
+      historialRows.forEach((r, i) => {
+        html += '<div class="hist-row" style="padding:2px 0;">' +
+          '<span class="hist-num" style="text-align:left;font-family:Nunito,sans-serif;font-size:.85rem;">' +
+          '<strong>Paso ' + (i + 1) + ':</strong> ' + r.texto + '</span></div>';
+        if (r.resta) {
+          html += '<div class="hist-row" style="padding-left:1rem;">' +
+            '<span class="hist-num hist-product" style="text-align:left;font-family:Nunito,sans-serif;font-size:.85rem;">↳ ' + r.resta + '</span></div>';
+        }
+        if (r.bajada) {
+          html += '<div class="hist-row" style="padding-left:1rem;">' +
+            '<span class="hist-num hist-bajando" style="text-align:left;font-family:Nunito,sans-serif;font-size:.85rem;">' + r.bajada + '</span></div>';
+        }
+      });
+
+      el.innerHTML = html;
+    }
+    /* ---- PREGUNTAR PASO ---- */
+    function preguntarPaso() {
+      if (curStep >= steps.length) { irResiduo(); return; }
+      renderCasita();
+      const s = steps[curStep];
+      subStep = 0;
+      highlightTabla(DVS, s.q);
+      if (s.partial < DVS) {
+        setMsg('msg1',
+          'Miramos el <strong>' + s.partial + '</strong>. ' +
+          '¿Cuántas veces cabe el <strong>' + DVS + '</strong> en <strong>' + s.partial + '</strong>? ' +
+          '(Si no cabe, escribe 0)'
+        );
+        // ✅ REEMPLAZAR POR
+      } else {
+        const esBajada = curStep > 0; // viene de una bajada si no es el primer paso
+        const prefijo = esBajada
+          ? '⬇️ Bajamos el <strong>' + dStr[s.digitIdx] + '</strong> → tenemos <strong>' + s.partial + '</strong>. '
+          : 'Tenemos <strong>' + s.partial + '</strong>. ';
+        setMsg('msg1', prefijo + '¿Cuántas veces cabe el <strong>' + DVS + '</strong> en el <strong>' + s.partial + '</strong>? Mira la tabla');
+      }
+      resetInput();
+    }
+
+    /* ---- VERIFICAR ---- */
+    function verificar() {
+      const val = parseInt(document.getElementById('inp1').value);
+      const fb = document.getElementById('fb1');
+      const inp = document.getElementById('inp1');
+      const s = steps[curStep];
+      if (isNaN(val) || val < 0) { showFb(fb, 'err', '⚠️ Escribe un número.'); return; }
+
+      if (subStep === 0) {
+        if (val !== s.q) {
+          inp.className = 'small error';
+          if (val > s.q)
+            showFb(fb, 'err', '❌ ' + DVS + '×' + val + '=' + DVS * val + ', eso se pasa de ' + s.partial + '. Intenta menos.');
+          else
+            showFb(fb, 'err', '❌ Casi: ' + DVS + '×' + val + '=' + DVS * val + '. Todavía cabe uno más. Revisa la tabla.');
+          return;
+        }
+        inp.className = 'small ok';
+        quotientArr[curStep] = s.q;
+        renderCasita();
+        updateResPanel();
+        if (s.q === 0) {
+          showFb(fb, 'ok', '✅ ¡Correcto! No cabe, ponemos 0 y seguimos.');
+          agregarAlHistorial(s, false, false);
+          setTimeout(() => { clearFb(fb); curStep++; preguntarPaso(); }, 1400);
+          return;
+        }
+        subStep = 1;
+        showFb(fb, 'ok',
+          '✅ ¡Sí! ' + DVS + '×' + s.q + '=' + s.prod +
+          '. Ahora resta: <strong>' + s.partial + ' − ' + s.prod + '</strong> = ?'
+        );
+        setTimeout(() => {
+          clearFb(fb);
+          inp.value = ''; inp.className = 'small';
+          setMsg('msg1', 'Ahora resta: <strong>' + s.partial + ' − ' + s.prod + '</strong> = ?');
+        }, 1400);
+
+      } else {
+        if (val !== s.rem) {
+          inp.className = 'small error';
+          showFb(fb, 'err', '❌ ' + s.partial + ' − ' + s.prod + ' no es ' + val + '. Cuenta de nuevo 🐾');
+          return;
+        }
+        inp.className = 'small ok';
+        renderCasita(true);
+        const hayBajada = s.rem > 0 && curStep + 1 < steps.length;
+        agregarAlHistorial(s, true, hayBajada);
+        // ✅ REEMPLAZAR POR ESTO
+        if (hayBajada) {
+          const nextD = dStr[s.digitIdx + 1];
+          const nuevoParcial = parseInt(String(s.rem) + nextD);
+
+          // MOMENTO 1: mostrar solo el resto (ej: 4), sin dígito bajado
+          const largoTotal = dStr.length;
+          const largoProd = String(s.prod).length;
+          const espaciosDer = largoTotal - s.digitIdx - 1;
+          const espaciosIzq = largoTotal - largoProd - espaciosDer - 1;
+          const padDer = '&nbsp;'.repeat(Math.max(0, espaciosDer));
+          const padIzq = '&nbsp;'.repeat(Math.max(0, espaciosIzq));
+          const largoLinea = String(s.partial).length + 1;
+          const padResto = '&nbsp;'.repeat(Math.max(0, espaciosDer));
+
+          document.getElementById('casita').innerHTML =
+            buildDividendoRow() +
+            `<div class="casita-row">
+      <span class="casita-op">−</span>
+      <span class="casita-num casita-product">${padIzq}${s.prod}${padDer}</span>
+    </div>` +
+            `<div class="casita-row resta-line" style="width:${largoLinea}ch;margin-left:auto;"></div>` +
+            `<div class="casita-row drop">
+      <span class="casita-op"></span>
+      <span class="casita-num casita-remain">${s.rem}${padResto}</span>
+    </div>`;
+
+          showFb(fb, 'ok', '✅ ' + s.partial + ' − ' + s.prod + ' = <strong>' + s.rem + '</strong>');
+
+          // MOMENTO 2: 1500ms — mostrar botón para bajar el dígito
+          setTimeout(() => {
+            clearFb(fb);
+            setMsg('msg1',
+              '⬇️ Ahora bajamos el <strong>' + nextD + '</strong> al lado del <strong>' +
+              s.rem + '</strong> → se forma el <strong>' + nuevoParcial + '</strong>. ' +
+              'Presiona el botón para continuar 🐾'
+            );
+            document.getElementById('area1').style.display = 'none';
+            document.getElementById('btn-bajar').innerHTML = '⬇️ Bajar el ' + nextD;
+            document.getElementById('btn-bajar').style.display = 'inline-flex';
+          }, 1500);
+        } else {
+          showFb(fb, 'ok',
+            s.rem === 0
+              ? '✅ ¡La resta da 0, perfecto!'
+              : '✅ ¡Correcto! Nos queda ' + s.rem + '.'
+          );
+          setTimeout(() => {
+            clearFb(fb);
+            curStep++;
+            renderCasita();
+            preguntarPaso();
+          }, 1400);
+        }
+        // ← aquí NO debe haber ningún setTimeout más
+      }
+    }
+
+    /* ---- RESIDUO ---- */
+    function irResiduo() {
+      hide('s1'); show('s2');
+      renderResumenDivision();
+      const q = getCuociente();
+      setMsg('msg2',
+        remainder === 0
+          ? 'El cociente es <strong>' + q + '</strong>. Mira la operación completa abajo. ¿Esta división tiene residuo?'
+          : 'El cociente es <strong>' + q + '</strong> y nos sobra <strong>' + remainder + '</strong>. Mira la operación completa abajo. ¿Tiene residuo?'
+      );
+    }
+
+    function respResiduo(dice) {
+      const fb = document.getElementById('fb2');
+      const hay = remainder !== 0;
+      if (dice === hay) {
+        showFb(fb, 'ok', hay ? '✅ ¡Correcto! Residuo = ' + remainder + ' 🌟' : '✅ ¡Exacto! División exacta, no sobra nada 🎉');
+        setTimeout(() => irComprobacion(), 1600);
+      } else {
+        showFb(fb, 'err', hay ? '❌ Sí hay residuo: ' + remainder : '❌ No hay residuo, la resta dio 0');
+      }
+    }
+
+    /* ---- COMPROBACIÓN ---- */
+    function irComprobacion() {
+      hide('s2'); show('s3');
+      multStep = 0; multReserva = 0; multPartials = []; multInnerStep = 0; multProdActual = 0;
+      const q = getCuociente();
+      setMsg('msg3', 'Para comprobar hacemos <strong>' + q + ' × ' + DVS + '</strong>. ¡Vamos dígito a dígito, de derecha a izquierda!');
+      renderMultVis();
+      setTimeout(() => pedirMultPaso(), 800);
+    }
+
+    function getDigitosMult() {
+      return String(getCuociente()).split('').map(Number).reverse();
+    }
+
+    function pedirMultPaso() {
+      const digits = getDigitosMult();
+      const fb = document.getElementById('fb3');
+      clearFb(fb);
+      document.getElementById('inp3').value = '';
+      document.getElementById('inp3').className = 'small';
+      if (multStep < digits.length) {
+        const d = digits[multStep];
+        const reservaAnterior = multStep > 0 ? multPartials[multStep - 1].reserva : 0;
+        if (multInnerStep === 0) {
+          setMsg('msg3', (multStep === 0 ? 'Primero' : 'Ahora') + ': <strong>' + DVS + ' × ' + d + '</strong> = ?');
+          highlightTabla(DVS, d);
+        } else {
+          setMsg('msg3', '¡Bien! Ahora suma: <strong>' + multProdActual + ' + ' + reservaAnterior + '</strong> (reserva) = ?');
+        }
+      } else {
+        // Construir resultado final incluyendo reserva si existe
+        let resultStr = multPartials.map(p => p.digito).reverse().join('');
+        if (multReserva > 0) resultStr = String(multReserva) + resultStr;
+        const resultadoFinal = parseInt(resultStr);
+
+        renderMultVis(true, resultadoFinal);
+        setMsg('msg3',
+          '🎉 ¡Listo! <strong>' + getCuociente() + ' × ' + DVS + ' = ' + resultadoFinal + '</strong>. ' +
+          (remainder > 0
+            ? 'Sumamos el residuo: <strong>' + resultadoFinal + ' + ' + remainder + ' = ' + DVD + '</strong> ✅'
+            : 'Que es exactamente <strong>' + DVD + '</strong> ✅')
+        );
+        document.getElementById('area3').style.display = 'none';
+        lanzarConfeti();
+        setTimeout(() => irRecta(), 2400);
+      }
+    }
+
+    function verificarMult() {
+      const val = parseInt(document.getElementById('inp3').value);
+      const fb = document.getElementById('fb3');
+      const inp = document.getElementById('inp3');
+      if (isNaN(val)) { showFb(fb, 'err', '⚠️ Escribe un número'); return; }
+      const digits = getDigitosMult();
+
+      if (multStep < digits.length) {
+        const d = digits[multStep];
+        const reservaAnterior = multStep > 0 ? multPartials[multStep - 1].reserva : 0;
+        if (multInnerStep === 0) {
+          const esperado = DVS * d;
+          if (val !== esperado) { inp.className = 'small error'; showFb(fb, 'err', '❌ ' + DVS + ' × ' + d + ' no es ' + val + '. Búscalo en la tabla 👀'); return; }
+          inp.className = 'small ok';
+          multProdActual = val;
+          if (reservaAnterior > 0) {
+            showFb(fb, 'ok', '✅ ' + DVS + ' × ' + d + ' = ' + val + '. Ahora suma la reserva.');
+            multInnerStep = 1;
+            setTimeout(() => { clearFb(fb); pedirMultPaso(); }, 1200);
+          } else {
+            const digitoBajo = val % 10; const nuevaReserva = Math.floor(val / 10);
+            multPartials.push({ digito: digitoBajo, reserva: nuevaReserva, sumaFinal: val });
+            multReserva = nuevaReserva;
+            showFb(fb, 'ok', nuevaReserva > 0
+              ? '✅ ' + DVS + '×' + d + ' = ' + val + ' → escribimos <strong>' + digitoBajo + '</strong>, reserva <strong>' + nuevaReserva + '</strong>'
+              : '✅ ' + DVS + '×' + d + ' = ' + val + ' → escribimos <strong>' + digitoBajo + '</strong>');
+            renderMultVis(); multInnerStep = 0; multStep++;
+            setTimeout(() => { clearFb(fb); pedirMultPaso(); }, 1600);
+          }
+        } else {
+          const esperado = multProdActual + reservaAnterior;
+          if (val !== esperado) { inp.className = 'small error'; showFb(fb, 'err', '❌ ' + multProdActual + ' + ' + reservaAnterior + ' no es ' + val + '. ¡Suma de nuevo!'); return; }
+          inp.className = 'small ok';
+          const digitoBajo = val % 10; const nuevaReserva = Math.floor(val / 10);
+          multPartials.push({ digito: digitoBajo, reserva: nuevaReserva, sumaFinal: val });
+          multReserva = nuevaReserva;
+          showFb(fb, 'ok', nuevaReserva > 0
+            ? '✅ ' + multProdActual + ' + ' + reservaAnterior + ' = ' + val + ' → escribimos <strong>' + digitoBajo + '</strong>, nueva reserva <strong>' + nuevaReserva + '</strong>'
+            : '✅ ' + multProdActual + ' + ' + reservaAnterior + ' = ' + val + ' → escribimos <strong>' + digitoBajo + '</strong>');
+          renderMultVis(); multInnerStep = 0; multStep++;
+          setTimeout(() => { clearFb(fb); pedirMultPaso(); }, 1800);
+        }
+      } else {
+        const esperado = DVD - remainder;
+        if (val !== esperado) { inp.className = 'small error'; showFb(fb, 'err', '❌ ' + getCuociente() + ' × ' + DVS + ' = ' + esperado + ', no ' + val + '. Intenta de nuevo.'); return; }
+        inp.className = 'small ok';
+        showFb(fb, 'ok', remainder > 0
+          ? '✅ ¡Brillante! ' + val + ' + residuo(' + remainder + ') = ' + DVD + '. ¡Comprobado! 🏆'
+          : '✅ ¡Brillante! ' + val + ' = ' + DVD + '. ¡División perfectamente comprobada! 🏆');
+        renderMultVis(true, val);
+        lanzarConfeti();
+        setTimeout(() => irRecta(), 2400);
+      }
+    }
+
+    /* ---- RENDER MULTIPLICACIÓN (reservas bien posicionadas sobre cada dígito) ---- */
+    function renderMultVis(final, resultadoFinal) {
+      const el = document.getElementById('mult-vis');
+      const q = getCuociente();
+      const qStr = String(q);
+      const digits = getDigitosMult();
+      let colsHtml = '';
+      // ✅ REEMPLAZAR POR
+      for (let i = 0; i < qStr.length; i++) {
+        // Los dígitos se procesan de derecha a izquierda, guardados en multPartials[0]=unidades, [1]=decenas...
+        // La reserva de multPartials[k] se muestra SOBRE el dígito k+1 (siguiente a la izquierda)
+        const idxEnPartials = qStr.length - 1 - i; // índice de este dígito en multPartials
+        const reservaMostrar = (idxEnPartials > 0 && (idxEnPartials - 1) < multPartials.length)
+          ? multPartials[idxEnPartials - 1].reserva : 0;
+        colsHtml += '<div class="mult-digit-col">' +
+          '<div class="mult-digit-reserva">' + (reservaMostrar > 0 ? reservaMostrar : '&nbsp;') + '</div>' +
+          '<div class="mult-digit-num">' + qStr[i] + '</div></div>';
+      }
+      let html = '<div class="mult-row"><div class="mult-digits-wrap">' + colsHtml + '</div></div>';
+      html += '<div class="mult-row"><span>× ' + DVS + '</span></div>';
+      html += '<div class="mult-row line"></div>';
+      if (final && resultadoFinal !== undefined) {
+        html += '<div class="mult-row mult-result flash"><span>' + resultadoFinal + '</span></div>';
+        // ✅ REEMPLAZAR POR
+      } else if (multPartials.length > 0) {
+        let resultStr = multPartials.map(p => p.digito).reverse().join('');
+        // Solo agregar reserva final si aún no se procesó como dígito
+        if (multStep >= digits.length && multReserva > 0 && multPartials.length === digits.length) {
+          resultStr = String(multReserva) + resultStr;
+        }
+        html += '<div class="mult-row mult-result flash"><span>' + resultStr + '</span></div>';
+      } else {
+        html += '<div class="mult-row"><span style="color:#ccc;font-size:1.2rem">?</span></div>';
+      }
+      el.innerHTML = html;
+    }
+    /* ---- RECTA NUMÉRICA ---- */
+    function irRecta() {
+      hide('s3');
+      show('s4');
+      const q = getCuociente();
+
+      // 1. Cambiamos lo que dice Rufo para que hable de grupos
+      setMsg('msg4', '¡Mira! Hemos formado <strong>' + q + ' grupos</strong> de <strong>' + DVS + '</strong> ' +
+        (remainder > 0 ? 'y nos sobran ' + remainder : 'exactamente') +
+        '. ¡Así funciona repartir! 📦'
+      );
+
+      // 2. Cambiamos el título de la tarjeta de "Recta numérica" a "Grupos"
+      const titulo = document.querySelector('#s4 .card-title');
+      if (titulo) titulo.innerHTML = '📦 Grupos formados';
+
+      // 3. Borramos el SVG de la recta y ponemos el gráfico de grupos
+      const contenedorRecta = document.querySelector('.recta-wrap');
+      contenedorRecta.innerHTML = '';
+      contenedorRecta.appendChild(crearGraficoGrupos(DVD, DVS, q, remainder));
+    }
+
+    function dibujarRecta(q, dv, res) {
+      const svg = document.getElementById('recta-svg');
+      svg.innerHTML = '';
+      const W = 560, H = 100, lineY = 62, mL = 24, mR = 24, lineW = W - mL - mR;
+      const total = DVD;
+      const maxSaltos = Math.min(q, 18);
+      const scale = lineW / total;
+      const colors = ['#ff7043', '#42a5f5', '#66bb6a', '#ab47bc', '#ffca28', '#26c6da', '#ef5350'];
+      svgEl(svg, 'line', { x1: mL, y1: lineY, x2: W - mR, y2: lineY, stroke: '#777', 'stroke-width': 3 });
+      for (let i = 0; i < maxSaltos; i++) {
+        const x1 = mL + i * dv * scale, x2 = mL + (i + 1) * dv * scale, xm = (x1 + x2) / 2;
+        const col = colors[i % colors.length];
+        svgEl(svg, 'path', { d: 'M' + x1 + ' ' + lineY + ' Q' + xm + ' ' + (lineY - 26) + ' ' + x2 + ' ' + lineY, fill: 'none', stroke: col, 'stroke-width': 2.2, opacity: .85 });
+        svgText(svg, i + 1, xm, lineY - 30, '10', col);
+      }
+      if (q > 18) svgText(svg, '(mostrando 18 de ' + q + ' saltos)', W / 2, 14, '10', '#aaa');
+      for (let i = 0; i <= Math.min(q, 18); i++) {
+        const x = mL + i * dv * scale;
+        svgEl(svg, 'line', { x1: x, y1: lineY - 5, x2: x, y2: lineY + 5, stroke: '#555', 'stroke-width': 1.5 });
+        svgText(svg, i * dv, x, lineY + 18, '9', '#555');
+      }
+      svgEl(svg, 'circle', { cx: mL, cy: lineY, r: 5, fill: '#ff7043' });
+      svgEl(svg, 'circle', { cx: mL + Math.min(q, 18) * dv * scale, cy: lineY, r: 5, fill: '#66bb6a' });
+      svgText(svg, '0', mL, lineY + 30, '9', '#ff7043');
+      svgText(svg, DVD - res, mL + Math.min(q, 18) * dv * scale, lineY + 30, '9', '#66bb6a');
+    }
+
+    function svgEl(parent, tag, attrs) {
+      const el = document.createElementNS('http://www.w3.org/2000/svg', tag);
+      for (const [k, v] of Object.entries(attrs)) el.setAttribute(k, v);
+      parent.appendChild(el); return el;
+    }
+    function svgText(parent, txt, x, y, size, fill) {
+      const el = document.createElementNS('http://www.w3.org/2000/svg', 'text');
+      el.setAttribute('x', x); el.setAttribute('y', y);
+      el.setAttribute('text-anchor', 'middle');
+      el.setAttribute('font-size', size); el.setAttribute('fill', fill);
+      el.setAttribute('font-family', 'Fredoka One, cursive');
+      el.setAttribute('font-weight', '700');
+      el.textContent = txt; parent.appendChild(el);
+    }
+
+    /* ---- TABLA PITAGÓRICA ---- */
+    function buildTabla(dv) {
+      const t = document.getElementById('tabla');
+      let html = '<tr><td class="hdr">×</td>';
+      for (let c = 1; c <= 9; c++) html += '<td class="hdr">' + c + '</td>';
+      html += '</tr>';
+      for (let r = 1; r <= 9; r++) {
+        html += '<tr><td class="hdr">' + r + '</td>';
+        for (let c = 1; c <= 9; c++) html += '<td id="tc-' + r + '-' + c + '">' + r * c + '</td>';
+        html += '</tr>';
+      }
+      t.innerHTML = html;
+    }
+
+    function highlightTabla(dv, q) {
+      document.querySelectorAll('table.pita td:not(.hdr)').forEach(td => { td.className = ''; });
+      for (let c = 1; c <= 9; c++) {
+        const td = document.getElementById('tc-' + dv + '-' + c);
+        if (td) td.classList.add('row-hl');
+      }
+      if (q > 0) {
+        const exactTd = document.getElementById('tc-' + dv + '-' + q);
+        if (exactTd) exactTd.className = 'exact-hl';
+        const nearTd = document.getElementById('tc-' + dv + '-' + (q - 1));
+        if (nearTd && q > 1) nearTd.classList.add('near-hl');
+      }
+    }
+
+    /* ---- HELPERS ---- */
+    function getCuociente() {
+      return parseInt(quotientArr.filter(q => q !== null).join('')) || null;
+    }
+    function updateResPanel() {
+      const q = getCuociente();
+      const panel = document.getElementById('res-panel');
+      if (!q && q !== 0) { panel.textContent = '—'; return; }
+      const done = quotientArr.every(q => q !== null);
+      panel.innerHTML = done
+        ? DVD + ' ÷ ' + DVS + ' = <strong>' + q + '</strong>' + (remainder > 0 ? '<br>Residuo: ' + remainder : '<br>✅ Exacta')
+        : '…calculando';
+    }
+    function setMsg(id, html) { document.getElementById(id).innerHTML = html; }
+    function show(id) { const el = document.getElementById(id); el.classList.add('active'); el.style.display = ''; }
+    function hide(id) { const el = document.getElementById(id); el.classList.remove('active'); el.style.display = 'none'; }
+    function showFb(el, type, msg) { el.className = 'feedback ' + type + ' show'; el.innerHTML = msg; }
+    function clearFb(el) { el.className = 'feedback'; el.innerHTML = ''; }
+    function showErr(el, msg) { el.className = 'feedback err show'; el.textContent = msg; }
+    function resetInput() {
+      const inp = document.getElementById('inp1');
+      inp.value = ''; inp.className = 'small';
+      clearFb(document.getElementById('fb1'));
+    }
+    function ejecutarBajada() {
+      document.getElementById('btn-bajar').style.display = 'none';
+      document.getElementById('area1').style.display = 'flex';
+      curStep++;
+      renderCasita();
+      preguntarPaso();
+    }
+    function reiniciar() {
+      hide('s4');
+      document.getElementById('i-div').value = '';
+      document.getElementById('i-sor').value = '';
+      document.getElementById('res-panel').textContent = '—';
+      document.getElementById('historial-wrap').style.display = 'none';
+      document.getElementById('historial').innerHTML = '';
+      show('s0');
+      document.getElementById('s0').classList.add('active');
+    }
+    function lanzarConfeti() {
+      const colors = ['#ff7043', '#42a5f5', '#66bb6a', '#ffca28', '#ab47bc'];
+      for (let i = 0; i < 60; i++) {
+        const el = document.createElement('div');
+        el.className = 'confetti-piece';
+        el.style.left = Math.random() * 100 + 'vw';
+        el.style.background = colors[Math.floor(Math.random() * colors.length)];
+        el.style.animationDuration = (1.5 + Math.random() * 2) + 's';
+        el.style.animationDelay = (Math.random() * 1) + 's';
+        document.body.appendChild(el);
+        setTimeout(() => el.remove(), 4000);
+      }
+    }
+
+    function crearGraficoGrupos(dividendo, divisor, cociente, residuo) {
+      // Crear contenedor principal
+      const wrap = document.createElement('div');
+      wrap.style.marginTop = '25px';
+      wrap.style.textAlign = 'center';
+      wrap.style.animation = 'fadeIn 0.5s ease-in';
+
+      // Título explicativo
+      const titulo = document.createElement('h3');
+      titulo.style.color = 'var(--text)';
+      titulo.style.marginBottom = '15px';
+      titulo.style.fontFamily = "'Fredoka One', cursive";
+      titulo.innerHTML = `¡Repartimos ${dividendo} formando ${cociente} grupos de ${divisor}!`;
+      wrap.appendChild(titulo);
+
+      // Contenedor Flex para las cajitas
+      const container = document.createElement('div');
+      container.style.display = 'flex';
+      container.style.flexWrap = 'wrap';
+      container.style.gap = '15px';
+      container.style.justifyContent = 'center';
+      container.style.alignItems = 'center';
+      container.style.padding = '20px';
+      container.style.background = 'var(--yellow-light)';
+      container.style.borderRadius = 'var(--radius)';
+      container.style.boxShadow = 'var(--shadow)';
+
+      const maxVisibles = 12; // Si hay más de 12 grupos, resumimos con "..."
+      let gruposADibujar = cociente > maxVisibles ? 4 : cociente;
+
+      // Función interna para crear una sola caja
+      const crearCaja = (cantidad, esResiduo = false) => {
+        const caja = document.createElement('div');
+        caja.style.background = esResiduo ? 'var(--primary-light)' : 'var(--card)';
+        caja.style.border = esResiduo ? '3px dashed var(--primary)' : '3px solid var(--secondary)';
+        caja.style.borderRadius = '15px';
+        caja.style.padding = '10px 15px';
+        caja.style.minWidth = '75px';
+
+        // Si el número es pequeño, dibujamos huesitos. Si es muy grande, solo el número.
+        let iconos = '';
+        if (esResiduo && cantidad === 0) {
+          iconos = '✨';
+        } else {
+          iconos = cantidad <= 12 ? '🦴'.repeat(cantidad) : '📦';
+        }
+
+        const textoInferior = esResiduo ? (cantidad === 0 ? 'Exacta' : `Sobran ${cantidad}`) : cantidad;
+
+        caja.innerHTML = `
+      <div style="font-size: 22px; line-height: 1.4; letter-spacing: 2px;">${iconos}</div>
+      <div style="font-weight: 800; color: var(--text-soft); margin-top: 8px; font-size: 16px;">${textoInferior}</div>
+    `;
+        return caja;
+      };
+
+      // Dibujar los primeros grupos
+      for (let i = 0; i < gruposADibujar; i++) {
+        container.appendChild(crearCaja(divisor));
+      }
+
+      // Lógica para divisiones muy grandes (ej. 624 / 6)
+      if (cociente > maxVisibles) {
+        const puntos = document.createElement('div');
+        puntos.innerHTML = '...';
+        puntos.style.fontSize = '35px';
+        puntos.style.color = 'var(--text-soft)';
+        puntos.style.margin = '0 10px';
+        container.appendChild(puntos);
+
+        // Dibujar el último grupo para cerrar la idea
+        container.appendChild(crearCaja(divisor));
+      }
+
+      // Agregar siempre la caja del residuo (lo que sobra)
+      container.appendChild(crearCaja(residuo, true));
+
+      wrap.appendChild(container);
+      return wrap;
+    }
+  </script>
+</body>
+
+</html>
